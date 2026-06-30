@@ -43,7 +43,6 @@ const frame = css({
   gridTemplateColumns: "var(--gutter) 1fr var(--gutter)",
   // header band (bleeds to top) · body (fills) · footer band (bleeds to bottom)
   gridTemplateRows: "auto 1fr auto",
-  rowGap: "2",
   color: "#2b2317",
   overflow: "hidden"
 })
@@ -98,27 +97,26 @@ const titleText = css({
   whiteSpace: "nowrap"
 })
 
-// Body splits into two equal halves. Top half holds the cost rail (right) and
-// the kind's lead content (left); bottom half holds the worker table.
+// The body is one full-width grid (`1 / -1`) that owns its column lines, so
+// every piece is placed rather than margin-shifted. Columns: a left gutter
+// (card edge -> safe line), the 1fr content column, and an `auto` cost column
+// that runs out to the card's right edge. Rows: the lead/cost band over the
+// worker table.
 const bodyRegion = css({
-  gridColumn: "2",
+  gridColumn: "1 / -1",
   display: "grid",
-  gridTemplateRows: "1fr 1fr",
-  minHeight: 0
-})
-
-const bodyTop = css({
-  display: "flex",
-  alignItems: "flex-start",
-  justifyContent: "space-between",
-  gap: "2",
-  minHeight: 0
+  gridTemplateColumns: "var(--gutter) 1fr auto",
+  gridTemplateRows: "2fr 3fr",
+  minHeight: 0,
+  // Unit-scaled default so every descendant tracks the zoom knob instead of
+  // falling back to the fixed 16px root size.
+  fontSize: "body"
 })
 
 const bodyTopMain = css({
-  flex: "1",
+  gridColumn: "2",
+  gridRow: "1",
   minWidth: 0,
-  fontSize: "body",
   lineHeight: 1.35,
   whiteSpace: "pre-line",
   display: "flex",
@@ -126,30 +124,35 @@ const bodyTopMain = css({
   gap: "2"
 })
 
-const bodyBottom = css({
-  minHeight: 0,
-  display: "flex",
-  flexDirection: "column"
-})
-
-// Vertical cost rail down the body's right edge, starting at the top.
+// Cost rail in the `auto` column, centered down the top-half row. That track
+// ends at the card's right edge, so the right-aligned badges land their right
+// side on it.
 const costRail = css({
+  gridColumn: "3",
+  gridRow: "1",
+  alignSelf: "center",
   display: "flex",
   flexDirection: "column",
   alignItems: "flex-end",
-  gap: "1",
-  flexShrink: 0
+  gap: "1"
 })
 
-// Icon + number in a rounded rectangle. Dark on the cream body so it reads.
+// A dark band bleeding off the right edge — the horizontal twin of the header /
+// footer bands. Its box reaches the card edge, but the value is balanced about
+// the *cut* line (the real card boundary): it sits 2u inside the cut, mirroring
+// the 2u the icon sits inside the left edge, with the dark running past the cut
+// as bleed. paddingRight = bleed margin (gutter − 3u trim inset) + 2u match.
+// Only the left corners round, since the right runs off the cut.
 const costBadge = css({
   display: "inline-flex",
   alignItems: "center",
   gap: "1",
   background: "#2b2317",
   color: "#f4ecd8",
-  borderRadius: "1",
-  paddingInline: "2",
+  borderStartStartRadius: "1",
+  borderEndStartRadius: "1",
+  paddingLeft: "2",
+  paddingRight: "calc(var(--gutter) - 1 * var(--u))",
   paddingBlock: "1",
   fontSize: "body",
   fontWeight: 700,
@@ -158,14 +161,45 @@ const costBadge = css({
 
 const icon = css({ width: "4", height: "4", flexShrink: 0 })
 
-// Worker->output table (fills the body's bottom half). Column 1 is the worker
-// slot (a circle); column 2 is the fruit it yields.
-const workerTable = css({
+// Worker->output table: a full-bleed banded zone in the body's lower row. The
+// table owns its own column lines — gutter | slot (1fr) | output (2fr) | gutter
+// — so it spans edge to edge (tinted background, plus a divider rule across the
+// top that splits the card) while the cells land in the safe column with no
+// margins or re-inset padding. The slot/output boundary carries a vertical rule,
+// and stacked slots are parted by soft horizontal rules.
+const fieldTable = css({
+  gridColumn: "1 / -1",
+  gridRow: "2",
+  minHeight: 0,
   display: "grid",
-  gridTemplateColumns: "auto 1fr",
-  columnGap: "3",
-  rowGap: "2",
-  alignItems: "center"
+  gridTemplateColumns: "var(--gutter) 1fr 2fr var(--gutter)",
+  gridAutoRows: "1fr",
+  borderTop: "0.3mm solid #6b6150",
+  background: "rgba(43, 35, 23, 0.06)"
+})
+
+const fieldSlotCell = css({
+  gridColumn: "2",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  paddingBlock: "2",
+  borderInlineEnd: "0.3mm solid #6b6150"
+})
+
+const fieldOutputCell = css({
+  gridColumn: "3",
+  display: "flex",
+  alignItems: "center",
+  paddingBlock: "2",
+  paddingInlineStart: "3",
+  fontWeight: 700,
+  fontVariantNumeric: "tabular-nums"
+})
+
+// Soft horizontal rule between stacked slots; omitted above the first row.
+const fieldRowDivider = css({
+  borderTop: "0.2mm solid rgba(107, 97, 80, 0.3)"
 })
 
 // An empty slot a worker token drops into during harvest.
@@ -175,11 +209,6 @@ const slotCircle = css({
   borderRadius: "9999px",
   border: "0.4mm solid #6b6150",
   background: "#fffdf6"
-})
-
-const slotOutput = css({
-  fontWeight: 700,
-  fontVariantNumeric: "tabular-nums"
 })
 
 // Thin dark stripe mirroring the header: bleeds to the bottom edge, with
@@ -256,11 +285,15 @@ function fieldRegions(card: FieldCard): BodyRegions {
   return {
     top: null,
     bottom: (
-      <div className={workerTable}>
+      <div className={fieldTable}>
         {card.slots.map((slot, i) => (
           <Fragment key={i}>
-            <span className={slotCircle} />
-            <span className={slotOutput}>{`${slot.amount} ${card.fruit}`}</span>
+            <span className={cx(fieldSlotCell, i > 0 && fieldRowDivider)}>
+              <span className={slotCircle} />
+            </span>
+            <span className={cx(fieldOutputCell, i > 0 && fieldRowDivider)}>
+              {`${slot.amount} ${card.fruit}`}
+            </span>
           </Fragment>
         ))}
       </div>
@@ -316,11 +349,9 @@ export function Card({
         </div>
       </div>
       <div className={bodyRegion}>
-        <div className={bodyTop}>
-          <div className={bodyTopMain}>{regions.top}</div>
-          <CostRail cost={card.cost} />
-        </div>
-        <div className={bodyBottom}>{regions.bottom}</div>
+        <div className={bodyTopMain}>{regions.top}</div>
+        <CostRail cost={card.cost} />
+        {regions.bottom}
       </div>
       <Footer copies={card.copies} />
       {showGuides && variant === "bleed" && <Guides />}
