@@ -1,4 +1,4 @@
-import { css } from "~/generated/styled-system/css";
+import { css } from "~/generated/styled-system/css"
 
 const bar = css({
   display: "flex",
@@ -9,26 +9,26 @@ const bar = css({
   background: "#262626",
   color: "#e5e5e5",
   fontSize: "14px",
-  userSelect: "none",
-});
+  userSelect: "none"
+})
 
-const label = css({ display: "flex", alignItems: "center", gap: "8px" });
+const label = css({ display: "flex", alignItems: "center", gap: "8px" })
 
 // `--u` ranges over real millimetres-per-unit. 1mm = true physical size on a
 // ~96dpi display; larger values zoom in.
-const MIN = 1;
-const MAX = 6;
+const MIN = 1
+const MAX = 6
 
 export function ZoomControl({
   zoom,
   onZoom,
   showGuides,
-  onToggleGuides,
+  onToggleGuides
 }: {
-  zoom: number;
-  onZoom: (v: number) => void;
-  showGuides: boolean;
-  onToggleGuides: (v: boolean) => void;
+  zoom: number
+  onZoom: (v: number) => void
+  showGuides: boolean
+  onToggleGuides: (v: boolean) => void
 }) {
   return (
     <div className={bar}>
@@ -55,5 +55,5 @@ export function ZoomControl({
         Guides
       </label>
     </div>
-  );
+  )
 }

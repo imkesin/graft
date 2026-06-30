@@ -1,5 +1,6 @@
-# Graft Root
+# Graft
 
 ## Commit Style
 
-- Do not include any information about the agent used (e.g. "Co-Authored-By: ...") in a commit message.
+- Do not include any information about the agent used (e.g. "Co-Authored-By: ...") in a commit
+  message.

@@ -1,6 +1,8 @@
-import type { CSSProperties } from "react";
-import { css } from "~/generated/styled-system/css";
-import { Card } from "~/components/Card";
+import { type CSSProperties, useState } from "react"
+import { deck, expandDeck } from "~/cards/deck"
+import type { PlayerCount } from "~/cards/types"
+import { Card } from "~/components/Card"
+import { css } from "~/generated/styled-system/css"
 
 /**
  * Home print-and-play sheet. Lays cards out 3-across on US Letter, trim size
@@ -20,30 +22,27 @@ import { Card } from "~/components/Card";
 
 // US Letter and trim-card geometry, in millimetres (page geometry is in real
 // mm, independent of the `--u` card-unit zoom).
-const PAGE_W = 215.9;
-const PAGE_H = 279.4;
-const CARD_W = 63;
-const CARD_H = 88;
-const COLS = 3;
-const ROWS = 3;
-const PER_PAGE = COLS * ROWS;
+const PAGE_W = 215.9
+const PAGE_H = 279.4
+const CARD_W = 63
+const CARD_H = 88
+const COLS = 3
+const ROWS = 3
+const PER_PAGE = COLS * ROWS
 
 // Centre the 3x3 block on the page; the leftover becomes symmetric margins.
-const MARGIN_X = (PAGE_W - COLS * CARD_W) / 2; // 13.45mm
-const MARGIN_Y = (PAGE_H - ROWS * CARD_H) / 2; // 7.7mm
-const TICK_LEN = 4; // mm
-const TICK_W = 0.2; // mm
+const MARGIN_X = (PAGE_W - COLS * CARD_W) / 2 // 13.45mm
+const MARGIN_Y = (PAGE_H - ROWS * CARD_H) / 2 // 7.7mm
+const TICK_LEN = 4 // mm
+const TICK_W = 0.2 // mm
 
-// The deck. Hardcoded for now; index suffix makes pagination/order legible.
-const DECK = Array.from({ length: 20 }, (_, i) => ({
-  title: `Net-Net Stock ${i + 1}`,
-}));
+const PLAYER_COUNTS: readonly PlayerCount[] = [2, 3, 4]
 
-const chunks = <T,>(arr: T[], size: number): T[][] => {
-  const out: T[][] = [];
-  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
-  return out;
-};
+function chunks<T>(arr: readonly T[], size: number): T[][] {
+  const out: T[][] = []
+  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size))
+  return out
+}
 
 const printCss = `
   :root { --u: 1mm; }
@@ -58,7 +57,7 @@ const printCss = `
     .sheet { box-shadow: none !important; margin: 0 !important; height: auto !important; padding-bottom: 0 !important; }
     .sheet:not(:first-of-type) { break-before: page; }
   }
-`;
+`
 
 const screen = css({
   // On screen: stack the sheets on a neutral backdrop so it reads as paper.
@@ -68,8 +67,8 @@ const screen = css({
   flexDirection: "column",
   alignItems: "center",
   gap: "24px",
-  padding: "24px",
-});
+  padding: "24px"
+})
 
 const note = css({
   position: "fixed",
@@ -81,55 +80,67 @@ const note = css({
   color: "#e5e5e5",
   fontSize: "13px",
   padding: "8px 14px",
-  borderRadius: "8px",
-});
+  borderRadius: "8px"
+})
 
 const sheetStyle = css({
   position: "relative",
   background: "#fff",
   boxSizing: "border-box",
   boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
-  flex: "none",
-});
+  flex: "none"
+})
 
 const gridStyle = css({
   display: "grid",
-  gap: 0,
-});
+  gap: 0
+})
 
 function Ticks() {
-  const marks: CSSProperties[] = [];
+  const marks: CSSProperties[] = []
   // Vertical ticks at each column boundary, in the top and bottom margins.
   for (let c = 0; c <= COLS; c++) {
-    const x = MARGIN_X + c * CARD_W;
-    const v = { left: `${x - TICK_W / 2}mm`, width: `${TICK_W}mm`, background: "#000", position: "absolute" as const };
-    marks.push({ ...v, top: `${MARGIN_Y - TICK_LEN}mm`, height: `${TICK_LEN}mm` });
-    marks.push({ ...v, top: `${MARGIN_Y + ROWS * CARD_H}mm`, height: `${TICK_LEN}mm` });
+    const x = MARGIN_X + c * CARD_W
+    const v = { left: `${x - TICK_W / 2}mm`, width: `${TICK_W}mm`, background: "#000", position: "absolute" as const }
+    marks.push({ ...v, top: `${MARGIN_Y - TICK_LEN}mm`, height: `${TICK_LEN}mm` })
+    marks.push({ ...v, top: `${MARGIN_Y + ROWS * CARD_H}mm`, height: `${TICK_LEN}mm` })
   }
   // Horizontal ticks at each row boundary, in the left and right margins.
   for (let r = 0; r <= ROWS; r++) {
-    const y = MARGIN_Y + r * CARD_H;
-    const h = { top: `${y - TICK_W / 2}mm`, height: `${TICK_W}mm`, background: "#000", position: "absolute" as const };
-    marks.push({ ...h, left: `${MARGIN_X - TICK_LEN}mm`, width: `${TICK_LEN}mm` });
-    marks.push({ ...h, left: `${MARGIN_X + COLS * CARD_W}mm`, width: `${TICK_LEN}mm` });
+    const y = MARGIN_Y + r * CARD_H
+    const h = { top: `${y - TICK_W / 2}mm`, height: `${TICK_W}mm`, background: "#000", position: "absolute" as const }
+    marks.push({ ...h, left: `${MARGIN_X - TICK_LEN}mm`, width: `${TICK_LEN}mm` })
+    marks.push({ ...h, left: `${MARGIN_X + COLS * CARD_W}mm`, width: `${TICK_LEN}mm` })
   }
   return (
     <>
-      {marks.map((s, i) => (
-        <div key={i} style={s} />
-      ))}
+      {marks.map((s, i) => <div key={i} style={s} />)}
     </>
-  );
+  )
 }
 
 export function PrintPage() {
-  const pages = chunks(DECK, PER_PAGE);
+  const [players, setPlayers] = useState<PlayerCount>(4)
+  const pages = chunks(expandDeck(deck, players), PER_PAGE)
   return (
     <>
       <style>{printCss}</style>
       <div className={`print-root ${screen}`}>
         <div className={`${note} screen-only`}>
           Print → Letter · Margins: None · Scale: 100%
+          <label style={{ marginLeft: "12px" }}>
+            Players{" "}
+            <select
+              value={players}
+              onChange={(e) => setPlayers(Number(e.target.value) as PlayerCount)}
+            >
+              {PLAYER_COUNTS.map((n) => (
+                <option key={n} value={n}>
+                  {n}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
         {pages.map((page, pi) => (
           <div
@@ -138,7 +149,7 @@ export function PrintPage() {
             style={{
               width: `${PAGE_W}mm`,
               height: `${PAGE_H}mm`,
-              padding: `${MARGIN_Y}mm ${MARGIN_X}mm`,
+              padding: `${MARGIN_Y}mm ${MARGIN_X}mm`
             }}
           >
             <Ticks />
@@ -146,13 +157,11 @@ export function PrintPage() {
               className={gridStyle}
               style={{ gridTemplateColumns: `repeat(${COLS}, ${CARD_W}mm)` }}
             >
-              {page.map((card, ci) => (
-                <Card key={ci} variant="trim" title={card.title} />
-              ))}
+              {page.map((card, ci) => <Card key={`${pi}-${ci}`} variant="trim" card={card} />)}
             </div>
           </div>
         ))}
       </div>
     </>
-  );
+  )
 }

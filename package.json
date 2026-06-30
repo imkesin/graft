@@ -7,10 +7,14 @@
     "prepare": "panda codegen",
     "dev": "panda codegen && vite",
     "build": "panda codegen && tsc -b && vite build",
-    "lint": "oxlint",
+    "lint": "oxlint && dprint check",
+    "lint:fix": "oxlint --fix && dprint fmt",
+    "format": "dprint fmt",
+    "format:check": "dprint check",
     "preview": "vite preview"
   },
   "dependencies": {
+    "lucide-react": "^1.22.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7"
   },
@@ -20,6 +24,7 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.2",
+    "dprint": "^0.54.0",
     "oxlint": "^1.69.0",
     "playwright": "^1.61.1",
     "typescript": "~6.0.2",

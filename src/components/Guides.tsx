@@ -1,4 +1,4 @@
-import { css } from "~/generated/styled-system/css";
+import { css } from "~/generated/styled-system/css"
 
 /**
  * Dev-only print guides, overlaid on the full-bleed card surface.
@@ -11,19 +11,19 @@ import { css } from "~/generated/styled-system/css";
  */
 const line = css({
   position: "absolute",
-  pointerEvents: "none",
-});
+  pointerEvents: "none"
+})
 
 const trim = css({
   borderRadius: "card",
   border: "0.3px dashed",
-  borderColor: "rgba(0, 120, 255, 0.9)",
-});
+  borderColor: "rgba(0, 120, 255, 0.9)"
+})
 
 const safe = css({
   border: "0.3px dashed",
-  borderColor: "rgba(255, 60, 60, 0.85)",
-});
+  borderColor: "rgba(255, 60, 60, 0.85)"
+})
 
 export function Guides() {
   return (
@@ -31,5 +31,5 @@ export function Guides() {
       <div className={`${line} ${trim}`} style={{ inset: "calc(3 * var(--u))" }} />
       <div className={`${line} ${safe}`} style={{ inset: "calc(6 * var(--u))" }} />
     </>
-  );
+  )
 }
