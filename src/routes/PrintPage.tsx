@@ -1,6 +1,6 @@
 import { type CSSProperties, useState } from "react"
 import { deck, expandDeck } from "~/cards/deck"
-import type { PlayerCount } from "~/cards/types"
+import type { PlayerCount } from "~/cards/domain"
 import { Card } from "~/components/Card"
 import { css } from "~/generated/styled-system/css"
 

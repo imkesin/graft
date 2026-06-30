@@ -1,6 +1,14 @@
 import { Coins, PersonStanding } from "lucide-react"
 import { Fragment, type ReactNode } from "react"
-import type { Card as CardData, Cost, FieldCard, FieldImprovementCard, PlayerCount } from "~/cards/types"
+import type {
+  Card,
+  CardBase,
+  CardDefinition,
+  Cost,
+  FieldCardBase,
+  FieldImprovementCardBase,
+  PlayerCount
+} from "~/cards/domain"
 import { css, cx } from "~/generated/styled-system/css"
 import { Guides } from "./Guides"
 
@@ -281,7 +289,7 @@ function CostRail({ cost }: { cost: Cost }) {
 
 type BodyRegions = { top: ReactNode; bottom: ReactNode }
 
-function fieldRegions(card: FieldCard): BodyRegions {
+function fieldRegions(card: FieldCardBase): BodyRegions {
   return {
     top: null,
     bottom: (
@@ -301,16 +309,15 @@ function fieldRegions(card: FieldCard): BodyRegions {
   }
 }
 
-function improvementRegions(card: FieldImprovementCard): BodyRegions {
+function improvementRegions(card: FieldImprovementCardBase): BodyRegions {
   return { top: card.additionalText, bottom: null }
 }
 
-function Footer({ copies }: { copies: CardData["copies"] }) {
-  const present = PLAYER_COUNTS.filter((n) => copies[n] > 0)
+function Footer({ symbols }: { symbols: readonly PlayerCount[] }) {
   return (
     <div className={footer}>
       <div className={footerContent}>
-        {present.map((n) => (
+        {symbols.map((n) => (
           <span key={n} className={playerPip}>
             {n}
           </span>
@@ -320,7 +327,7 @@ function Footer({ copies }: { copies: CardData["copies"] }) {
   )
 }
 
-function bodyRegions(card: CardData): BodyRegions {
+function bodyRegions(card: CardBase): BodyRegions {
   switch (card.kind) {
     case "field":
       return fieldRegions(card)
@@ -336,11 +343,16 @@ export function Card({
   variant = "bleed",
   showGuides = false
 }: {
-  card: CardData
+  card: CardDefinition | Card
   variant?: CardVariant
   showGuides?: boolean
 }) {
   const regions = bodyRegions(card)
+  // A physical card bears one player-count symbol; a catalog card shows every
+  // count at which it appears.
+  const symbols = "minPlayerCount" in card
+    ? [card.minPlayerCount]
+    : PLAYER_COUNTS.filter((n) => card.copies[n] > 0)
   return (
     <div className={cx(frame, variant === "bleed" ? bleedFrame : trimFrame)}>
       <div className={header}>
@@ -353,7 +365,7 @@ export function Card({
         <CostRail cost={card.cost} />
         {regions.bottom}
       </div>
-      <Footer copies={card.copies} />
+      <Footer symbols={symbols} />
       {showGuides && variant === "bleed" && <Guides />}
     </div>
   )
