@@ -1,18 +1,11 @@
 import { Coins, PersonStanding } from "lucide-react"
 import { Fragment, type ReactNode } from "react"
-import type {
-  Card,
-  CardBase,
-  CardDefinition,
-  Cost,
-  FieldCardBase,
-  FieldImprovementCardBase,
-  PlayerCount
-} from "~/cards/domain"
-import { css, cx } from "~/generated/styled-system/css"
+import type { Card, CardBase, Cost, FieldCardBase, FieldImprovementCardBase, PlayerCount } from "~/cards/domain"
+import { css, cva, cx } from "~/generated/styled-system/css"
 import { Guides } from "./Guides"
 
-const PLAYER_COUNTS: readonly PlayerCount[] = [2, 3, 4]
+/** Field cards read as brown (fields, crops); capital improvements as stone. */
+type CardKind = CardBase["kind"]
 
 /**
  * A single poker card. Two render variants:
@@ -45,14 +38,42 @@ export type CardVariant = "bleed" | "trim"
 
 const frame = css({
   position: "relative",
-  background: "#f4ecd8",
   boxSizing: "border-box",
   display: "grid",
   gridTemplateColumns: "var(--gutter) 1fr var(--gutter)",
   // header band (bleeds to top) · body (fills) · footer band (bleeds to bottom)
   gridTemplateRows: "auto 1fr auto",
-  color: "#2b2317",
   overflow: "hidden"
+})
+
+// Paper + ink: the card's base surface and text colour, by kind.
+const paperFrame = cva({
+  variants: {
+    kind: {
+      field: { background: "brown.50", color: "brown.900" },
+      "field-improvement": { background: "stone.50", color: "stone.900" }
+    }
+  }
+})
+
+// Ink + paper, inverted: header/footer bands and the cost badge, by kind.
+const darkBand = cva({
+  variants: {
+    kind: {
+      field: { background: "brown.900", color: "brown.50" },
+      "field-improvement": { background: "stone.900", color: "stone.50" }
+    }
+  }
+})
+
+// Paper-toned borders (e.g. the player-count ring against a dark band).
+const paperBorder = cva({
+  variants: {
+    kind: {
+      field: { borderColor: "brown.50" },
+      "field-improvement": { borderColor: "stone.50" }
+    }
+  }
 })
 
 const bleedFrame = css({
@@ -64,10 +85,19 @@ const bleedFrame = css({
 const trimFrame = css({
   width: "trimW",
   height: "trimH",
-  "--gutter": "calc(3 * var(--u))",
-  // Hairline cut line on the trim boundary. `outline` doesn't affect layout,
-  // so adjacent cards' outlines coincide into a single shared cut line.
-  outline: "0.2mm solid #6b6150"
+  "--gutter": "calc(3 * var(--u))"
+})
+
+// Hairline cut line on the trim boundary. `outline` doesn't affect layout, so
+// adjacent cards' outlines coincide into a single shared cut line.
+const accentOutline = cva({
+  base: { outlineWidth: "0.2mm", outlineStyle: "solid" },
+  variants: {
+    kind: {
+      field: { outlineColor: "brown.500" },
+      "field-improvement": { outlineColor: "stone.500" }
+    }
+  }
 })
 
 // Full-width band: spans all columns so its colour bleeds to both edges. Top
@@ -79,8 +109,6 @@ const header = css({
   display: "grid",
   gridTemplateColumns: "subgrid",
   alignItems: "center",
-  background: "#2b2317",
-  color: "#f4ecd8",
   paddingTop: "var(--gutter)",
   // Match the trimmed top inset (3u) so the title is centred within the band's
   // visible (post-cut) area in both variants.
@@ -108,22 +136,52 @@ const titleText = css({
 // The body is one full-width grid (`1 / -1`) that owns its column lines, so
 // every piece is placed rather than margin-shifted. Columns: a left gutter
 // (card edge -> safe line), the 1fr content column, and an `auto` cost column
-// that runs out to the card's right edge. Rows: the lead/cost band over the
-// worker table.
-const bodyRegion = css({
-  gridColumn: "1 / -1",
-  display: "grid",
-  gridTemplateColumns: "var(--gutter) 1fr auto",
-  gridTemplateRows: "2fr 3fr",
-  minHeight: 0,
-  // Unit-scaled default so every descendant tracks the zoom knob instead of
-  // falling back to the fixed 16px root size.
-  fontSize: "body"
+// that runs out to the card's right edge. Rows: fields keep the lead/cost band
+// over the worker table (2fr/3fr); capital improvements split evenly (1fr/1fr)
+// since their description text lives in the bottom half.
+const bodyRegion = cva({
+  base: {
+    gridColumn: "1 / -1",
+    display: "grid",
+    gridTemplateColumns: "var(--gutter) 1fr auto",
+    minHeight: 0,
+    // Unit-scaled default so every descendant tracks the zoom knob instead of
+    // falling back to the fixed 16px root size.
+    fontSize: "body"
+  },
+  variants: {
+    kind: {
+      field: { gridTemplateRows: "2fr 3fr" },
+      "field-improvement": { gridTemplateRows: "1fr 1fr" }
+    }
+  }
 })
 
 const bodyTopMain = css({
   gridColumn: "2",
   gridRow: "1",
+  minWidth: 0,
+  lineHeight: 1.35,
+  whiteSpace: "pre-line",
+  display: "flex",
+  flexDirection: "column",
+  gap: "2"
+})
+
+// Mirrors `fieldTable`: the bottom row's `auto` cost column goes unused (the
+// cost rail only ever occupies row 1), so this spans `1 / -1` and re-declares
+// its own gutter|1fr|gutter columns to reclaim that width instead of being
+// boxed into the parent's narrower `1fr` content track.
+const improvementBand = css({
+  gridColumn: "1 / -1",
+  gridRow: "2",
+  minHeight: 0,
+  display: "grid",
+  gridTemplateColumns: "var(--gutter) 1fr var(--gutter)"
+})
+
+const improvementText = css({
+  gridColumn: "2",
   minWidth: 0,
   lineHeight: 1.35,
   whiteSpace: "pre-line",
@@ -155,8 +213,6 @@ const costBadge = css({
   display: "inline-flex",
   alignItems: "center",
   gap: "1",
-  background: "#2b2317",
-  color: "#f4ecd8",
   borderStartStartRadius: "1",
   borderEndStartRadius: "1",
   paddingLeft: "2",
@@ -182,8 +238,10 @@ const fieldTable = css({
   display: "grid",
   gridTemplateColumns: "var(--gutter) 1fr 2fr var(--gutter)",
   gridAutoRows: "1fr",
-  borderTop: "0.3mm solid #6b6150",
-  background: "rgba(43, 35, 23, 0.06)"
+  borderTopWidth: "0.3mm",
+  borderTopStyle: "solid",
+  borderTopColor: "brown.500",
+  background: "brown.900/6"
 })
 
 const fieldSlotCell = css({
@@ -192,7 +250,9 @@ const fieldSlotCell = css({
   alignItems: "center",
   justifyContent: "center",
   paddingBlock: "2",
-  borderInlineEnd: "0.3mm solid #6b6150"
+  borderInlineEndWidth: "0.3mm",
+  borderInlineEndStyle: "solid",
+  borderInlineEndColor: "brown.500"
 })
 
 const fieldOutputCell = css({
@@ -207,7 +267,9 @@ const fieldOutputCell = css({
 
 // Soft horizontal rule between stacked slots; omitted above the first row.
 const fieldRowDivider = css({
-  borderTop: "0.2mm solid rgba(107, 97, 80, 0.3)"
+  borderTopWidth: "0.2mm",
+  borderTopStyle: "solid",
+  borderTopColor: "brown.500/30"
 })
 
 // An empty slot a worker token drops into during harvest.
@@ -215,8 +277,10 @@ const slotCircle = css({
   width: "8",
   height: "8",
   borderRadius: "9999px",
-  border: "0.4mm solid #6b6150",
-  background: "#fffdf6"
+  borderWidth: "0.4mm",
+  borderStyle: "solid",
+  borderColor: "brown.500",
+  background: "brown.50"
 })
 
 // Thin dark stripe mirroring the header: bleeds to the bottom edge, with
@@ -226,8 +290,6 @@ const footer = css({
   display: "grid",
   gridTemplateColumns: "subgrid",
   alignItems: "center",
-  background: "#2b2317",
-  color: "#f4ecd8",
   // Mirror of the header: paddingBottom = gutter puts content on the safe line;
   // paddingTop = 3 (the trimmed bottom inset) centres it in the visible stripe.
   paddingTop: "3",
@@ -249,7 +311,8 @@ const playerPip = css({
   width: "3",
   height: "3",
   borderRadius: "9999px",
-  border: "0.2mm solid #f4ecd8",
+  borderWidth: "0.2mm",
+  borderStyle: "solid",
   fontSize: "micro",
   fontWeight: 700,
   lineHeight: 1,
@@ -260,29 +323,29 @@ function assertNever(value: never): never {
   throw new Error(`Unhandled card kind: ${JSON.stringify(value)}`)
 }
 
-function WorkerCost({ workers }: { workers: number }) {
+function WorkerCost({ workers, kind }: { workers: number; kind: CardKind }) {
   return (
-    <span className={costBadge}>
+    <span className={cx(costBadge, darkBand({ kind }))}>
       <PersonStanding className={icon} />
       {workers}
     </span>
   )
 }
 
-function GoldCost({ gold }: { gold: number }) {
+function GoldCost({ gold, kind }: { gold: number; kind: CardKind }) {
   return (
-    <span className={costBadge}>
+    <span className={cx(costBadge, darkBand({ kind }))}>
       <Coins className={icon} />
       {gold}
     </span>
   )
 }
 
-function CostRail({ cost }: { cost: Cost }) {
+function CostRail({ cost, kind }: { cost: Cost; kind: CardKind }) {
   return (
     <div className={costRail}>
-      {cost.workers > 0 && <WorkerCost workers={cost.workers} />}
-      {cost.gold > 0 && <GoldCost gold={cost.gold} />}
+      {cost.workers > 0 && <WorkerCost workers={cost.workers} kind={kind} />}
+      {cost.gold > 0 && <GoldCost gold={cost.gold} kind={kind} />}
     </div>
   )
 }
@@ -310,18 +373,21 @@ function fieldRegions(card: FieldCardBase): BodyRegions {
 }
 
 function improvementRegions(card: FieldImprovementCardBase): BodyRegions {
-  return { top: card.additionalText, bottom: null }
+  return {
+    top: null,
+    bottom: (
+      <div className={improvementBand}>
+        <div className={improvementText}>{card.additionalText}</div>
+      </div>
+    )
+  }
 }
 
-function Footer({ symbols }: { symbols: readonly PlayerCount[] }) {
+function Footer({ minPlayerCount, kind }: { minPlayerCount: PlayerCount; kind: CardKind }) {
   return (
-    <div className={footer}>
+    <div className={cx(footer, darkBand({ kind }))}>
       <div className={footerContent}>
-        {symbols.map((n) => (
-          <span key={n} className={playerPip}>
-            {n}
-          </span>
-        ))}
+        <span className={cx(playerPip, paperBorder({ kind }))}>{minPlayerCount}</span>
       </div>
     </div>
   )
@@ -343,29 +409,32 @@ export function Card({
   variant = "bleed",
   showGuides = false
 }: {
-  card: CardDefinition | Card
+  card: Card
   variant?: CardVariant
   showGuides?: boolean
 }) {
   const regions = bodyRegions(card)
-  // A physical card bears one player-count symbol; a catalog card shows every
-  // count at which it appears.
-  const symbols = "minPlayerCount" in card
-    ? [card.minPlayerCount]
-    : PLAYER_COUNTS.filter((n) => card.copies[n] > 0)
+
   return (
-    <div className={cx(frame, variant === "bleed" ? bleedFrame : trimFrame)}>
-      <div className={header}>
+    <div
+      className={cx(
+        frame,
+        paperFrame({ kind: card.kind }),
+        variant === "bleed" ? bleedFrame : trimFrame,
+        variant === "trim" && accentOutline({ kind: card.kind })
+      )}
+    >
+      <div className={cx(header, darkBand({ kind: card.kind }))}>
         <div className={headerContent}>
           <span className={titleText}>{card.name}</span>
         </div>
       </div>
-      <div className={bodyRegion}>
+      <div className={bodyRegion({ kind: card.kind })}>
         <div className={bodyTopMain}>{regions.top}</div>
-        <CostRail cost={card.cost} />
+        <CostRail cost={card.cost} kind={card.kind} />
         {regions.bottom}
       </div>
-      <Footer symbols={symbols} />
+      <Footer minPlayerCount={card.minPlayerCount} kind={card.kind} />
       {showGuides && variant === "bleed" && <Guides />}
     </div>
   )

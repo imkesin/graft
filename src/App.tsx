@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { deck } from "~/cards/deck"
+import { deck, previewCard } from "~/cards/deck"
 import { Card } from "~/components/Card"
 import { ZoomControl } from "~/components/ZoomControl"
 import { css } from "~/generated/styled-system/css"
@@ -17,6 +17,8 @@ const page = css({
 export function App() {
   const [zoom, setZoom] = useState(2.5)
   const [showGuides, setShowGuides] = useState(true)
+  const [selectedId, setSelectedId] = useState(deck[0]?.id)
+  const selected = deck.find((card) => card.id === selectedId) ?? deck[0]
 
   // `--u` must live on the root: Panda hoists the card-unit tokens to `:root`,
   // so their `var(--u)` is resolved there. Setting it on a nested wrapper has
@@ -33,7 +35,14 @@ export function App() {
         showGuides={showGuides}
         onToggleGuides={setShowGuides}
       />
-      {deck[0] && <Card card={deck[0]} showGuides={showGuides} />}
+      <select value={selectedId} onChange={(e) => setSelectedId(e.target.value)}>
+        {deck.map((card) => (
+          <option key={card.id} value={card.id}>
+            {card.name}
+          </option>
+        ))}
+      </select>
+      {selected && <Card card={previewCard(selected)} showGuides={showGuides} />}
     </div>
   )
 }

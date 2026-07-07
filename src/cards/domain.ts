@@ -4,8 +4,8 @@
  * `deck.ts`), so the compiler validates the whole catalog at build time — there
  * is no runtime decoding step.
  */
-
-export type PlayerCount = 2 | 3 | 4
+export const PLAYER_COUNTS = [2, 3, 4] as const
+export type PlayerCount = typeof PLAYER_COUNTS[number]
 
 /**
  * Every fruit, with the noun used for its field card. `fieldName` distinguishes
