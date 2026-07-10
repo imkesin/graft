@@ -1,6 +1,8 @@
 import { type CSSProperties, useState } from "react"
+import { CARD_TRIM_H_MM, CARD_TRIM_W_MM } from "~/cards/cardSize"
 import { deck, expandDeck } from "~/cards/deck"
 import type { PlayerCount } from "~/cards/domain"
+import { influenceDeck } from "~/cards/influenceDeck"
 import { Card } from "~/components/Card"
 import { css } from "~/generated/styled-system/css"
 
@@ -24,8 +26,8 @@ import { css } from "~/generated/styled-system/css"
 // mm, independent of the `--u` card-unit zoom).
 const PAGE_W = 215.9
 const PAGE_H = 279.4
-const CARD_W = 63
-const CARD_H = 88
+const CARD_W = CARD_TRIM_W_MM
+const CARD_H = CARD_TRIM_H_MM
 const COLS = 3
 const ROWS = 3
 const PER_PAGE = COLS * ROWS
@@ -121,7 +123,13 @@ function Ticks() {
 
 export function PrintPage() {
   const [players, setPlayers] = useState<PlayerCount>(4)
-  const pages = chunks(expandDeck(deck, players), PER_PAGE)
+  // Each deck is chunked into pages independently, then concatenated — so a
+  // partially-filled last page of one deck never shares a sheet with the
+  // next deck; the influence deck always starts on its own page.
+  const pages = [
+    ...chunks(expandDeck(deck, players), PER_PAGE),
+    ...chunks(expandDeck(influenceDeck, players), PER_PAGE)
+  ]
   return (
     <>
       <style>{printCss}</style>

@@ -1,11 +1,37 @@
 import { Coins, PersonStanding } from "lucide-react"
 import { Fragment, type ReactNode } from "react"
-import type { Card, CardBase, Cost, FieldCardBase, FieldImprovementCardBase, PlayerCount } from "~/cards/domain"
+import type {
+  Card,
+  CardBase,
+  Cost,
+  FieldCardBase,
+  FieldImprovementCardBase,
+  InfluenceCardBase,
+  PlayerCount
+} from "~/cards/domain"
+import { paperFrame } from "~/components/paperFrame"
 import { css, cva, cx } from "~/generated/styled-system/css"
 import { Guides } from "./Guides"
 
-/** Field cards read as brown (fields, crops); capital improvements as stone. */
+/**
+ * Field cards read as brown (fields, crops); field-improvements as stone;
+ * influences as zinc — near-white, with the header/footer bands brighter
+ * than the body rather than the dark-band inversion the other two kinds use.
+ */
 type CardKind = CardBase["kind"]
+
+// The card's base surface, by kind — the shared `paperFrame` recipe (see
+// ~/components/paperFrame) covers all four kinds with no deviation.
+const KIND_PAPER_COLOR = {
+  field: "brown",
+  "field-improvement": "stone",
+  influence: "zinc",
+  election: "cyan"
+} as const satisfies Record<CardKind, string>
+
+/** Field-improvement owns the shared rules-text body layout. Influence has its
+ * own thirds layout (`InfluenceBody`). */
+type TextCardBase = FieldImprovementCardBase
 
 /**
  * A single poker card. Two render variants:
@@ -46,32 +72,30 @@ const frame = css({
   overflow: "hidden"
 })
 
-// Paper + ink: the card's base surface and text colour, by kind.
-const paperFrame = cva({
-  variants: {
-    kind: {
-      field: { background: "brown.50", color: "brown.900" },
-      "field-improvement": { background: "stone.50", color: "stone.900" }
-    }
-  }
-})
-
-// Ink + paper, inverted: header/footer bands and the cost badge, by kind.
+// Header/footer bands and the cost badge, by kind. Field and field-improvement
+// invert contrast (dark band, light ink); influence instead brightens the
+// band above the body while keeping ink dark throughout.
 const darkBand = cva({
   variants: {
     kind: {
       field: { background: "brown.900", color: "brown.50" },
-      "field-improvement": { background: "stone.900", color: "stone.50" }
+      "field-improvement": { background: "stone.900", color: "stone.50" },
+      influence: { background: "white", color: "zinc.900" },
+      election: { background: "cyan.600", color: "cyan.50" }
     }
   }
 })
 
-// Paper-toned borders (e.g. the player-count ring against a dark band).
+// Border for the player-count ring, chosen to contrast against this kind's
+// band background — the paper colour where the band is dark, the ink colour
+// where the band (influence) is light.
 const paperBorder = cva({
   variants: {
     kind: {
       field: { borderColor: "brown.50" },
-      "field-improvement": { borderColor: "stone.50" }
+      "field-improvement": { borderColor: "stone.50" },
+      influence: { borderColor: "zinc.900" },
+      election: { borderColor: "cyan.50" }
     }
   }
 })
@@ -95,7 +119,9 @@ const accentOutline = cva({
   variants: {
     kind: {
       field: { outlineColor: "brown.500" },
-      "field-improvement": { outlineColor: "stone.500" }
+      "field-improvement": { outlineColor: "stone.500" },
+      influence: { outlineColor: "zinc.500" },
+      election: { outlineColor: "cyan.500" }
     }
   }
 })
@@ -137,8 +163,9 @@ const titleText = css({
 // every piece is placed rather than margin-shifted. Columns: a left gutter
 // (card edge -> safe line), the 1fr content column, and an `auto` cost column
 // that runs out to the card's right edge. Rows: fields keep the lead/cost band
-// over the worker table (2fr/3fr); capital improvements split evenly (1fr/1fr)
-// since their description text lives in the bottom half.
+// over the worker table (2fr/3fr); text-body cards (field-improvement,
+// improvement) split evenly (1fr/1fr) since their rules text fills the bottom
+// half. Influence does not use this region — see `influenceBody`.
 const bodyRegion = cva({
   base: {
     gridColumn: "1 / -1",
@@ -168,26 +195,115 @@ const bodyTopMain = css({
   gap: "2"
 })
 
+// Shared by field-improvement and influence, the two rules-text kinds.
 // Mirrors `fieldTable`: the bottom row's `auto` cost column goes unused (the
 // cost rail only ever occupies row 1), so this spans `1 / -1` and re-declares
 // its own gutter|1fr|gutter columns to reclaim that width instead of being
-// boxed into the parent's narrower `1fr` content track.
-const improvementBand = css({
-  gridColumn: "1 / -1",
-  gridRow: "2",
-  minHeight: 0,
-  display: "grid",
-  gridTemplateColumns: "var(--gutter) 1fr var(--gutter)"
+// boxed into the parent's narrower `1fr` content track. The border-top divides
+// it from the top half (cost rail) above, matching the mid-tone `fieldTable`
+// already uses for its own slot/output divider.
+const textBand = cva({
+  base: {
+    gridColumn: "1 / -1",
+    gridRow: "2",
+    minHeight: 0,
+    display: "grid",
+    gridTemplateColumns: "var(--gutter) 1fr var(--gutter)",
+    borderTopWidth: "0.3mm",
+    borderTopStyle: "solid"
+  },
+  variants: {
+    kind: {
+      "field-improvement": { borderTopColor: "stone.500" }
+    }
+  }
 })
 
-const improvementText = css({
+const textBandContent = css({
   gridColumn: "2",
   minWidth: 0,
+  paddingTop: "3",
+  // One step down from the inherited `body` size — this is paragraph text,
+  // not a table/label.
+  fontSize: "paragraph",
   lineHeight: 1.35,
   whiteSpace: "pre-line",
   display: "flex",
   flexDirection: "column",
   gap: "2"
+})
+
+// Influence body: two rows (art · text) rather than the field/improvement
+// column split. Columns mirror the field body (gutter | 1fr | auto) so the
+// fulfilment cost rides the same top-right rail as a field's acquisition cost;
+// the text band spans every column and re-declares gutter|1fr|gutter so it
+// bleeds edge to edge.
+const influenceBody = css({
+  gridColumn: "1 / -1",
+  display: "grid",
+  gridTemplateColumns: "var(--gutter) 1fr auto",
+  // Art on top; the group name and goal text fill the larger lower row.
+  gridTemplateRows: "1fr 2fr",
+  minHeight: 0,
+  fontSize: "body"
+})
+
+// Top row: intentionally blank space reserved for art. Spans every column so
+// future art bleeds full width; the cost rail sits over its top-right corner.
+const influenceArt = css({
+  gridColumn: "1 / -1",
+  gridRow: "1",
+  minHeight: 0
+})
+
+// Lower row: full-bleed text band parted from the art above by a hairline rule
+// (mirrors `textBand`/`fieldTable` dividers). Holds the bold group name and the
+// goal / completion condition.
+const influenceBand = css({
+  gridColumn: "1 / -1",
+  gridRow: "2",
+  minHeight: 0,
+  display: "grid",
+  gridTemplateColumns: "var(--gutter) 1fr var(--gutter)",
+  borderTopWidth: "0.3mm",
+  borderTopStyle: "solid",
+  borderTopColor: "zinc.500"
+})
+
+// The impacted group, a bold lead-in ahead of the goal text.
+const influenceGroupName = css({
+  fontWeight: 700,
+  letterSpacing: "0.02em"
+})
+
+// Dark fill for the cost badge on influence paper: the field kinds' `darkBand`
+// resolves to a light band for influence (see `darkBand`), which would vanish
+// against the near-white body, so the fulfilment cost inverts to a dark chip.
+const influenceCostFill = css({
+  background: "zinc.900",
+  color: "zinc.50"
+})
+
+// Lower row content: the bold group name followed by the goal / completion
+// condition (plus any timing preconditions) as one freeform paragraph.
+const influenceGoalContent = css({
+  gridColumn: "2",
+  minWidth: 0,
+  paddingTop: "3",
+  fontSize: "paragraph",
+  lineHeight: 1.35,
+  whiteSpace: "pre-line",
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "flex-start",
+  gap: "2"
+})
+
+// Election body: intentionally empty for now. Occupies the body row so the
+// footer stays pinned to the bottom of the frame grid.
+const electionBody = css({
+  gridColumn: "1 / -1",
+  minHeight: 0
 })
 
 // Cost rail in the `auto` column, centered down the top-half row. That track
@@ -249,6 +365,7 @@ const fieldSlotCell = css({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
+  gap: "0.5",
   paddingBlock: "2",
   borderInlineEndWidth: "0.3mm",
   borderInlineEndStyle: "solid",
@@ -360,7 +477,7 @@ function fieldRegions(card: FieldCardBase): BodyRegions {
         {card.slots.map((slot, i) => (
           <Fragment key={i}>
             <span className={cx(fieldSlotCell, i > 0 && fieldRowDivider)}>
-              <span className={slotCircle} />
+              {Array.from({ length: slot.workers }, (_, w) => <span key={w} className={slotCircle} />)}
             </span>
             <span className={cx(fieldOutputCell, i > 0 && fieldRowDivider)}>
               {`${slot.amount} ${card.fruit}`}
@@ -372,15 +489,46 @@ function fieldRegions(card: FieldCardBase): BodyRegions {
   }
 }
 
-function improvementRegions(card: FieldImprovementCardBase): BodyRegions {
+function textCardRegions(card: TextCardBase): BodyRegions {
   return {
     top: null,
     bottom: (
-      <div className={improvementBand}>
-        <div className={improvementText}>{card.additionalText}</div>
+      <div className={textBand({ kind: card.kind })}>
+        <div className={textBandContent}>{card.additionalText}</div>
       </div>
     )
   }
+}
+
+function InfluenceBody({ card }: { card: InfluenceCardBase }) {
+  const workers = card.additionalCost?.workers ?? 0
+  const gold = card.additionalCost?.gold ?? 0
+
+  return (
+    <div className={influenceBody}>
+      <div className={influenceArt} />
+      <div className={costRail}>
+        {workers > 0 && (
+          <span className={cx(costBadge, influenceCostFill)}>
+            <PersonStanding className={icon} />
+            {workers}
+          </span>
+        )}
+        {gold > 0 && (
+          <span className={cx(costBadge, influenceCostFill)}>
+            <Coins className={icon} />
+            {gold}
+          </span>
+        )}
+      </div>
+      <div className={influenceBand}>
+        <div className={influenceGoalContent}>
+          <span className={influenceGroupName}>{card.group}</span>
+          {card.additionalText}
+        </div>
+      </div>
+    </div>
+  )
 }
 
 function Footer({ minPlayerCount, kind }: { minPlayerCount: PlayerCount; kind: CardKind }) {
@@ -393,15 +541,32 @@ function Footer({ minPlayerCount, kind }: { minPlayerCount: PlayerCount; kind: C
   )
 }
 
-function bodyRegions(card: CardBase): BodyRegions {
+function bodyRegions(card: FieldCardBase | FieldImprovementCardBase): BodyRegions {
   switch (card.kind) {
     case "field":
       return fieldRegions(card)
     case "field-improvement":
-      return improvementRegions(card)
+      return textCardRegions(card)
     default:
       return assertNever(card)
   }
+}
+
+function CardBody({ card }: { card: Card }) {
+  if (card.kind === "influence") {
+    return <InfluenceBody card={card} />
+  }
+  if (card.kind === "election") {
+    return <div className={electionBody} />
+  }
+  const regions = bodyRegions(card)
+  return (
+    <div className={bodyRegion({ kind: card.kind })}>
+      <div className={bodyTopMain}>{regions.top}</div>
+      <CostRail cost={card.cost} kind={card.kind} />
+      {regions.bottom}
+    </div>
+  )
 }
 
 export function Card({
@@ -413,13 +578,11 @@ export function Card({
   variant?: CardVariant
   showGuides?: boolean
 }) {
-  const regions = bodyRegions(card)
-
   return (
     <div
       className={cx(
         frame,
-        paperFrame({ kind: card.kind }),
+        paperFrame({ color: KIND_PAPER_COLOR[card.kind] }),
         variant === "bleed" ? bleedFrame : trimFrame,
         variant === "trim" && accentOutline({ kind: card.kind })
       )}
@@ -429,11 +592,7 @@ export function Card({
           <span className={titleText}>{card.name}</span>
         </div>
       </div>
-      <div className={bodyRegion({ kind: card.kind })}>
-        <div className={bodyTopMain}>{regions.top}</div>
-        <CostRail cost={card.cost} kind={card.kind} />
-        {regions.bottom}
-      </div>
+      <CardBody card={card} />
       <Footer minPlayerCount={card.minPlayerCount} kind={card.kind} />
       {showGuides && variant === "bleed" && <Guides />}
     </div>

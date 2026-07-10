@@ -16,13 +16,52 @@ const smallFields = FRUIT_LIST_WITH_METADATA.map(({ name, fieldName }) => ({
     gold: 6
   },
   copies: {
-    2: 2,
-    3: 2,
-    4: 2
+    2: 1,
+    3: 1,
+    4: 1
   },
   fruit: name,
   slots: [
     { workers: 1, amount: 1 }
+  ]
+})) satisfies ReadonlyArray<CardDefinition>
+
+const wildFields = FRUIT_LIST_WITH_METADATA.map(({ name, fieldName }) => ({
+  kind: "field",
+  id: `wild-${name.toLowerCase()}-field`,
+  name: `Wild ${name} ${fieldName}`,
+  cost: {
+    workers: 0,
+    gold: 3
+  },
+  copies: {
+    2: 1,
+    3: 1,
+    4: 1
+  },
+  fruit: name,
+  slots: [
+    { workers: 2, amount: 1 },
+    { workers: 1, amount: 1 }
+  ]
+})) satisfies ReadonlyArray<CardDefinition>
+
+const remoteFields = FRUIT_LIST_WITH_METADATA.map(({ name, fieldName }) => ({
+  kind: "field",
+  id: `remote-${name.toLowerCase()}-field`,
+  name: `Remote ${name} ${fieldName}`,
+  cost: {
+    workers: 2,
+    gold: 4
+  },
+  copies: {
+    2: 0,
+    3: 0,
+    4: 1
+  },
+  fruit: name,
+  slots: [
+    { workers: 2, amount: 2 }
   ]
 })) satisfies ReadonlyArray<CardDefinition>
 
@@ -37,7 +76,7 @@ const mediumFields = FRUIT_LIST_WITH_METADATA.map(({ name, fieldName }) => ({
   copies: {
     2: 1,
     3: 1,
-    4: 2
+    4: 1
   },
   fruit: name,
   slots: [
@@ -46,50 +85,88 @@ const mediumFields = FRUIT_LIST_WITH_METADATA.map(({ name, fieldName }) => ({
   ]
 })) satisfies ReadonlyArray<CardDefinition>
 
+const largeFields = FRUIT_LIST_WITH_METADATA.map(({ name, fieldName }) => ({
+  kind: "field",
+  id: `lg-${name.toLowerCase()}-field`,
+  name: `Large ${name} ${fieldName}`,
+  cost: {
+    workers: 4,
+    gold: 12
+  },
+  copies: {
+    2: 0,
+    3: 1,
+    4: 1
+  },
+  fruit: name,
+  slots: [
+    { workers: 1, amount: 2 },
+    { workers: 2, amount: 3 }
+  ]
+})) satisfies ReadonlyArray<CardDefinition>
+
 export const deck: Deck = [
   ...smallFields,
+  ...wildFields,
+  ...remoteFields,
   ...mediumFields,
+  ...largeFields,
   {
     kind: "field-improvement",
     id: "irrigation-channel",
     name: "Irrigation Channel",
-    cost: { workers: 3, gold: 3 },
+    cost: {
+      workers: 3,
+      gold: 3
+    },
     copies: {
       2: 1,
       3: 1,
       4: 2
     },
-    additionalText: "After a worker has harvested this field, you may retain them by immediately moving them into a slot on another field. A maximum of 2 workers may be retained this way"
+    additionalText:
+      "After a worker has harvested this field, you may retain them by immediately moving them into a slot on another field. A maximum of 2 workers may be retained this way."
   },
-    {
+  {
     kind: "field-improvement",
     id: "local-workforce",
     name: "Local Workforce",
-    cost: { workers: 0, gold: 2 },
+    cost: {
+      workers: 0,
+      gold: 2
+    },
     copies: {
       2: 1,
       3: 2,
       4: 2
     },
-    additionalText: "During a harvest, you may pay 1 gold to work one empty slot on this Field (rather than using a worker from your pool)."
+    additionalText:
+      "During a harvest, you may pay 1 gold to work one empty slot on this Field (rather than using a worker from your pool)."
   },
   {
     kind: "field-improvement",
     id: "focus-on-quality",
     name: "Focus on Quality",
-    cost: { workers: 1, gold: 0 },
+    cost: {
+      workers: 1,
+      gold: 0
+    },
     copies: {
       2: 1,
       3: 2,
       4: 2
     },
-    additionalText: "When fruit harvested from this Field is sold in the market, collect +2 additional gold for each sold this way. A field improved this way cannot produce more than two fruit per harvest."
+    additionalText:
+      "When fruit harvested from this Field is sold in the market, collect +2 additional gold for each sold this way. A field improved this way cannot produce more than two fruit per harvest."
   },
   {
     kind: "field-improvement",
     id: "high-density-planting",
     name: "High-Density Planting",
-    cost: { workers: 2, gold: 2 },
+    cost: {
+      workers: 2,
+      gold: 2
+    },
     copies: {
       2: 1,
       3: 2,
@@ -101,7 +178,10 @@ export const deck: Deck = [
     kind: "field-improvement",
     id: "on-site-processing",
     name: "On-Site Processing",
-    cost: { workers: 1, gold: 3 },
+    cost: {
+      workers: 1,
+      gold: 3
+    },
     copies: {
       2: 1,
       3: 1,
@@ -113,13 +193,17 @@ export const deck: Deck = [
     kind: "field-improvement",
     id: "companion-planting",
     name: "Companion Planting",
-    cost: { workers: 2, gold: 0 },
+    cost: {
+      workers: 2,
+      gold: 0
+    },
     copies: {
       2: 1,
       3: 1,
       4: 2
     },
-    additionalText: "Whenever this field and a field of a different fruit are harvest simultaneously, receive +1 fruit of either variety."
+    additionalText:
+      "Whenever this field and a field of a different fruit are harvest simultaneously, receive +1 fruit of either variety."
   }
 ]
 

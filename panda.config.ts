@@ -1,4 +1,5 @@
 import { defineConfig } from "@pandacss/dev"
+import { CARD_TRIM_H_MM, CARD_TRIM_W_MM } from "./src/cards/cardSize"
 
 /**
  * Card-unit token system.
@@ -26,8 +27,8 @@ const cardSizes = {
   bleed: u(3),
   cardW: u(69),
   cardH: u(94),
-  trimW: u(63),
-  trimH: u(88),
+  trimW: u(CARD_TRIM_W_MM),
+  trimH: u(CARD_TRIM_H_MM),
   safeW: u(57),
   safeH: u(82)
 }
@@ -69,6 +70,9 @@ export default defineConfig({
           title: u(5),
           name: u(3.8),
           body: u(3.4),
+          // One step down from `body`, for paragraph-style rules text
+          // (field-improvement, influence) rather than table/label text.
+          paragraph: u(2.8),
           micro: u(2.2)
         }
       }
