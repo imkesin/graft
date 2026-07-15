@@ -1,16 +1,19 @@
 import { useEffect, useState } from "react"
 import { marketStalls } from "~/board/market"
-import { deck, previewCard } from "~/cards/deck"
 import { type FruitName, PLAYER_COUNTS, type PlayerCount } from "~/cards/domain"
+import { fieldDeck, previewCard } from "~/cards/fieldDeck"
 import { influenceDeck } from "~/cards/influenceDeck"
+import { infrastructureDeck } from "~/cards/infrastructureDeck"
 import { Card } from "~/components/Card"
 import { MarketStall } from "~/components/MarketStall"
 import { ZoomControl } from "~/components/ZoomControl"
 import { css } from "~/generated/styled-system/css"
 
-// Field/field-improvement and Influence are separate printed decks, but the
-// preview picker below just needs one flat list of every card to browse.
-const allCards = [...deck, ...influenceDeck]
+const allCards = [
+  ...fieldDeck,
+  ...influenceDeck,
+  ...infrastructureDeck
+]
 
 const page = css({
   minHeight: "100vh",
@@ -20,6 +23,15 @@ const page = css({
   justifyContent: "center",
   gap: "24px",
   padding: "24px"
+})
+
+const select = css({
+  background: "#262626",
+  color: "#e5e5e5",
+  border: "1px solid #404040",
+  borderRadius: "6px",
+  padding: "6px 10px",
+  fontSize: "14px"
 })
 
 export function App() {
@@ -46,7 +58,7 @@ export function App() {
         showGuides={showGuides}
         onToggleGuides={setShowGuides}
       />
-      <select value={selectedId} onChange={(e) => setSelectedId(e.target.value)}>
+      <select className={select} value={selectedId} onChange={(e) => setSelectedId(e.target.value)}>
         {allCards.map((card) => (
           <option key={card.id} value={card.id}>
             {card.name}
@@ -54,7 +66,11 @@ export function App() {
         ))}
       </select>
       {selected && <Card card={previewCard(selected)} showGuides={showGuides} />}
-      <select value={stallFruit} onChange={(e) => setStallFruit(e.target.value as FruitName)}>
+      <select
+        className={select}
+        value={stallFruit}
+        onChange={(e) => setStallFruit(e.target.value as FruitName)}
+      >
         {marketStalls.map((s) => (
           <option key={s.fruit} value={s.fruit}>
             {s.fruit}
@@ -62,6 +78,7 @@ export function App() {
         ))}
       </select>
       <select
+        className={select}
         value={stallPlayers}
         onChange={(e) => setStallPlayers(Number(e.target.value) as PlayerCount)}
       >

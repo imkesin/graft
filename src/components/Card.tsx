@@ -1,37 +1,61 @@
 import { Coins, PersonStanding } from "lucide-react"
 import { Fragment, type ReactNode } from "react"
+import { FRUIT_LIST_WITH_METADATA } from "~/cards/domain"
 import type {
   Card,
   CardBase,
   Cost,
   FieldCardBase,
   FieldImprovementCardBase,
+  FruitColor,
+  FruitName,
   InfluenceCardBase,
+  InfrastructureCardBase,
   PlayerCount
 } from "~/cards/domain"
 import { paperFrame } from "~/components/paperFrame"
 import { css, cva, cx } from "~/generated/styled-system/css"
+import { token } from "~/generated/styled-system/tokens"
 import { Guides } from "./Guides"
 
 /**
  * Field cards read as brown (fields, crops); field-improvements as stone;
  * influences as zinc — near-white, with the header/footer bands brighter
  * than the body rather than the dark-band inversion the other two kinds use.
+ * Infrastructure cards read as neutral — near-black — following the same
+ * dark-band inversion as field/field-improvement.
  */
 type CardKind = CardBase["kind"]
 
 // The card's base surface, by kind — the shared `paperFrame` recipe (see
-// ~/components/paperFrame) covers all four kinds with no deviation.
+// ~/components/paperFrame) covers all five kinds with no deviation.
 const KIND_PAPER_COLOR = {
   field: "brown",
   "field-improvement": "stone",
   influence: "zinc",
-  election: "cyan"
+  election: "cyan",
+  infrastructure: "neutral"
 } as const satisfies Record<CardKind, string>
 
-/** Field-improvement owns the shared rules-text body layout. Influence has its
- * own thirds layout (`InfluenceBody`). */
-type TextCardBase = FieldImprovementCardBase
+const FRUIT_COLOR: Record<FruitName, FruitColor> = Object.fromEntries(
+  FRUIT_LIST_WITH_METADATA.map((f) => [f.name, f.color])
+) as Record<FruitName, FruitColor>
+
+// Field header/footer bands are a flat `brown.900` via `darkBand` below, but
+// each field additionally gradates left-to-right from its fruit's color into
+// that brown so fields read at a glance. The fruit varies per card, so this
+// can't be a static Panda token — it's resolved at render time with `token()`
+// and applied as an inline `background`, overriding `darkBand`'s flat one.
+function fieldBandBackground(fruit: FruitName): string {
+  return `linear-gradient(to right, ${token(`colors.${FRUIT_COLOR[fruit]}.900`)}, ${
+    token("colors.brown.900")
+  })`
+}
+
+/** Field-improvement and infrastructure share the rules-text body layout (a
+ * cost rail over a freeform text band). Influence has its own thirds layout
+ * (`InfluenceBody`). */
+type TextCardBase = FieldImprovementCardBase | InfrastructureCardBase
 
 /**
  * A single poker card. Two render variants:
@@ -81,7 +105,8 @@ const darkBand = cva({
       field: { background: "brown.900", color: "brown.50" },
       "field-improvement": { background: "stone.900", color: "stone.50" },
       influence: { background: "white", color: "zinc.900" },
-      election: { background: "cyan.600", color: "cyan.50" }
+      election: { background: "cyan.600", color: "cyan.50" },
+      infrastructure: { background: "neutral.900", color: "neutral.50" }
     }
   }
 })
@@ -95,7 +120,8 @@ const paperBorder = cva({
       field: { borderColor: "brown.50" },
       "field-improvement": { borderColor: "stone.50" },
       influence: { borderColor: "zinc.900" },
-      election: { borderColor: "cyan.50" }
+      election: { borderColor: "cyan.50" },
+      infrastructure: { borderColor: "neutral.50" }
     }
   }
 })
@@ -121,7 +147,8 @@ const accentOutline = cva({
       field: { outlineColor: "brown.500" },
       "field-improvement": { outlineColor: "stone.500" },
       influence: { outlineColor: "zinc.500" },
-      election: { outlineColor: "cyan.500" }
+      election: { outlineColor: "cyan.500" },
+      infrastructure: { outlineColor: "neutral.500" }
     }
   }
 })
@@ -179,7 +206,8 @@ const bodyRegion = cva({
   variants: {
     kind: {
       field: { gridTemplateRows: "2fr 3fr" },
-      "field-improvement": { gridTemplateRows: "1fr 1fr" }
+      "field-improvement": { gridTemplateRows: "1fr 1fr" },
+      infrastructure: { gridTemplateRows: "1fr 1fr" }
     }
   }
 })
@@ -214,7 +242,8 @@ const textBand = cva({
   },
   variants: {
     kind: {
-      "field-improvement": { borderTopColor: "stone.500" }
+      "field-improvement": { borderTopColor: "stone.500" },
+      infrastructure: { borderTopColor: "neutral.500" }
     }
   }
 })
@@ -531,9 +560,20 @@ function InfluenceBody({ card }: { card: InfluenceCardBase }) {
   )
 }
 
-function Footer({ minPlayerCount, kind }: { minPlayerCount: PlayerCount; kind: CardKind }) {
+function Footer({
+  minPlayerCount,
+  kind,
+  fruit
+}: {
+  minPlayerCount: PlayerCount
+  kind: CardKind
+  fruit?: FruitName | undefined
+}) {
   return (
-    <div className={cx(footer, darkBand({ kind }))}>
+    <div
+      className={cx(footer, darkBand({ kind }))}
+      style={fruit ? { background: fieldBandBackground(fruit) } : undefined}
+    >
       <div className={footerContent}>
         <span className={cx(playerPip, paperBorder({ kind }))}>{minPlayerCount}</span>
       </div>
@@ -541,11 +581,14 @@ function Footer({ minPlayerCount, kind }: { minPlayerCount: PlayerCount; kind: C
   )
 }
 
-function bodyRegions(card: FieldCardBase | FieldImprovementCardBase): BodyRegions {
+function bodyRegions(
+  card: FieldCardBase | FieldImprovementCardBase | InfrastructureCardBase
+): BodyRegions {
   switch (card.kind) {
     case "field":
       return fieldRegions(card)
     case "field-improvement":
+    case "infrastructure":
       return textCardRegions(card)
     default:
       return assertNever(card)
@@ -587,13 +630,20 @@ export function Card({
         variant === "trim" && accentOutline({ kind: card.kind })
       )}
     >
-      <div className={cx(header, darkBand({ kind: card.kind }))}>
+      <div
+        className={cx(header, darkBand({ kind: card.kind }))}
+        style={card.kind === "field" ? { background: fieldBandBackground(card.fruit) } : undefined}
+      >
         <div className={headerContent}>
           <span className={titleText}>{card.name}</span>
         </div>
       </div>
       <CardBody card={card} />
-      <Footer minPlayerCount={card.minPlayerCount} kind={card.kind} />
+      <Footer
+        minPlayerCount={card.minPlayerCount}
+        kind={card.kind}
+        fruit={card.kind === "field" ? card.fruit : undefined}
+      />
       {showGuides && variant === "bleed" && <Guides />}
     </div>
   )

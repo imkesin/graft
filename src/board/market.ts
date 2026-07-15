@@ -1,5 +1,5 @@
 import { FRUIT_LIST_WITH_METADATA } from "~/cards/domain"
-import type { FruitName } from "~/cards/domain"
+import type { FruitName, PlayerCount } from "~/cards/domain"
 import type { DemandSlot, MarketStallDefinition } from "./domain"
 
 const FRUIT_NAMES = FRUIT_LIST_WITH_METADATA.map((f) => f.name)
@@ -21,7 +21,7 @@ function placeholderInduces(index: number): readonly FruitName[] {
  * `gold: 0` or `inducedDemand: 0` on a slot renders that row blank (see the
  * last slot of each track below for an example).
  */
-const placeholderDemandTrack: Record<2 | 3 | 4, readonly DemandSlot[]> = {
+const placeholderDemandTrack = {
   2: [
     { gold: 5, inducedDemand: 0 },
     { gold: 3, inducedDemand: 1 },
@@ -46,7 +46,7 @@ const placeholderDemandTrack: Record<2 | 3 | 4, readonly DemandSlot[]> = {
     { gold: 1, inducedDemand: 1 },
     { gold: 0, inducedDemand: 2 }
   ]
-}
+} as const satisfies Record<PlayerCount, readonly DemandSlot[]>
 
 export const marketStalls: readonly MarketStallDefinition[] = FRUIT_LIST_WITH_METADATA.map((
   { name, color },

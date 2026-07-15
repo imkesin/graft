@@ -1,11 +1,4 @@
-import {
-  type Card,
-  type CardDefinition,
-  type Deck,
-  FRUIT_LIST_WITH_METADATA,
-  PLAYER_COUNTS,
-  type PlayerCount
-} from "./domain"
+import { type Card, type CardDefinition, type Deck, FRUIT_LIST_WITH_METADATA, PLAYER_COUNTS } from "./domain"
 
 const smallFields = FRUIT_LIST_WITH_METADATA.map(({ name, fieldName }) => ({
   kind: "field",
@@ -32,7 +25,7 @@ const wildFields = FRUIT_LIST_WITH_METADATA.map(({ name, fieldName }) => ({
   name: `Wild ${name} ${fieldName}`,
   cost: {
     workers: 0,
-    gold: 3
+    gold: 2
   },
   copies: {
     2: 1,
@@ -105,28 +98,12 @@ const largeFields = FRUIT_LIST_WITH_METADATA.map(({ name, fieldName }) => ({
   ]
 })) satisfies ReadonlyArray<CardDefinition>
 
-export const deck: Deck = [
+export const fieldDeck: Deck = [
   ...smallFields,
   ...wildFields,
   ...remoteFields,
   ...mediumFields,
   ...largeFields,
-  {
-    kind: "field-improvement",
-    id: "irrigation-channel",
-    name: "Irrigation Channel",
-    cost: {
-      workers: 3,
-      gold: 3
-    },
-    copies: {
-      2: 1,
-      3: 1,
-      4: 2
-    },
-    additionalText:
-      "After a worker has harvested this field, you may retain them by immediately moving them into a slot on another field. A maximum of 2 workers may be retained this way."
-  },
   {
     kind: "field-improvement",
     id: "local-workforce",
@@ -136,12 +113,27 @@ export const deck: Deck = [
       gold: 2
     },
     copies: {
-      2: 1,
-      3: 2,
-      4: 2
+      2: 2,
+      3: 3,
+      4: 3
     },
     additionalText:
       "During a harvest, you may pay 1 gold to work one empty slot on this Field (rather than using a worker from your pool)."
+  },
+  {
+    kind: "field-improvement",
+    id: "on-site-processing",
+    name: "On-Site Processing",
+    cost: {
+      workers: 1,
+      gold: 2
+    },
+    copies: {
+      2: 2,
+      3: 3,
+      4: 3
+    },
+    additionalText: "Whenever you sell two or more fruits from this Field, gain an additional +2 gold."
   },
   {
     kind: "field-improvement",
@@ -152,17 +144,32 @@ export const deck: Deck = [
       gold: 0
     },
     copies: {
-      2: 1,
+      2: 2,
       3: 2,
-      4: 2
+      4: 3
     },
     additionalText:
-      "When fruit harvested from this Field is sold in the market, collect +2 additional gold for each sold this way. A field improved this way cannot produce more than two fruit per harvest."
+      "When fruit harvested from this Field is sold in the market, collect +3 additional gold.\n\nA field improved this way cannot produce more than 1 fruit per harvest."
   },
   {
     kind: "field-improvement",
-    id: "high-density-planting",
-    name: "High-Density Planting",
+    id: "dense-planting",
+    name: "Dense Planting",
+    cost: {
+      workers: 1,
+      gold: 1
+    },
+    copies: {
+      2: 2,
+      3: 2,
+      4: 3
+    },
+    additionalText: "Whenever this Field is harvested with all worker slots full, it yields +1 fruit."
+  },
+  {
+    kind: "field-improvement",
+    id: "irrigation-channel",
+    name: "Irrigation Channel",
     cost: {
       workers: 2,
       gold: 2
@@ -170,69 +177,12 @@ export const deck: Deck = [
     copies: {
       2: 1,
       3: 2,
-      4: 2
-    },
-    additionalText: "Whenever this Field is harvested by the maximum number of workers, it yields +1 fruit."
-  },
-  {
-    kind: "field-improvement",
-    id: "on-site-processing",
-    name: "On-Site Processing",
-    cost: {
-      workers: 1,
-      gold: 3
-    },
-    copies: {
-      2: 1,
-      3: 1,
-      4: 2
-    },
-    additionalText: "Whenever you sell two or more fruits from this Field, gain an additional +2 gold."
-  },
-  {
-    kind: "field-improvement",
-    id: "companion-planting",
-    name: "Companion Planting",
-    cost: {
-      workers: 2,
-      gold: 0
-    },
-    copies: {
-      2: 1,
-      3: 1,
-      4: 2
+      4: 3
     },
     additionalText:
-      "Whenever this field and a field of a different fruit are harvest simultaneously, receive +1 fruit of either variety."
+      "After a worker has harvested this field, you may retain them by immediately moving them into a slot on another field. Only 1 worker may be retained this way."
   }
 ]
-
-/**
- * Expand the catalog into the physical deck for `players`: one entry per printed
- * copy. A card whose copy count grows with player count is split so each copy
- * carries the player-count symbol at which it enters (`minPlayers`) — copies
- * {2:1,3:1,4:2} yield one "2" copy and one "4" copy. Copies whose symbol exceeds
- * `players` are filtered out, so the result holds exactly `copies[players]` of
- * each card.
- */
-export function expandDeck(source: Deck, players: PlayerCount): readonly Card[] {
-  return source.flatMap(({ copies, ...base }) =>
-    PLAYER_COUNTS.reduce<{ previous: number; cards: Card[] }>(
-      ({ previous, cards }, minPlayerCount) => {
-        const introduced = copies[minPlayerCount] - previous
-
-        if (minPlayerCount <= players && introduced > 0) {
-          cards.push(...Array.from({ length: introduced }, () => ({ ...base, minPlayerCount })))
-        }
-        return { previous: copies[minPlayerCount], cards }
-      },
-      {
-        previous: 0,
-        cards: []
-      }
-    ).cards
-  )
-}
 
 /**
  * Turn a catalog definition into a single physical card for preview, stamped

@@ -1,8 +1,10 @@
 import { type CSSProperties, useState } from "react"
 import { CARD_TRIM_H_MM, CARD_TRIM_W_MM } from "~/cards/cardSize"
-import { deck, expandDeck } from "~/cards/deck"
+import { expandDeck } from "~/cards/deckUtils"
 import type { PlayerCount } from "~/cards/domain"
+import { fieldDeck } from "~/cards/fieldDeck"
 import { influenceDeck } from "~/cards/influenceDeck"
+import { infrastructureDeck } from "~/cards/infrastructureDeck"
 import { Card } from "~/components/Card"
 import { css } from "~/generated/styled-system/css"
 
@@ -47,17 +49,43 @@ function chunks<T>(arr: readonly T[], size: number): T[][] {
 }
 
 const printCss = `
-  :root { --u: 1mm; }
-  @page { size: letter; margin: 0; }
+  :root {
+    --u: 1mm;
+  }
+  @page {
+    size: letter; margin: 0;
+  }
   @media print {
-    html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; }
-    .screen-only { display: none !important; }
+    html, body {
+      margin: 0 !important;
+      padding: 0 !important;
+      background: #fff !important;
+    }
+    .screen-only {
+      display: none !important;
+    }
+
     /* Strip the on-screen backdrop so pages are pure white. */
-    .print-root { background: #fff !important; padding: 0 !important; gap: 0 !important; display: block !important; }
-    /* Content-height sheets (top margin + grid only) sit below one page so
-       there is no phantom overflow page; break-before starts each on a page. */
-    .sheet { box-shadow: none !important; margin: 0 !important; height: auto !important; padding-bottom: 0 !important; }
-    .sheet:not(:first-of-type) { break-before: page; }
+    .print-root {
+      background: #fff !important;
+      padding: 0 !important;
+      gap: 0 !important;
+      display: block !important;
+    }
+
+    /*
+       Content-height sheets (top margin + grid only) sit below one page so
+       there is no phantom overflow page; break-before starts each on a page.
+     */
+    .sheet {
+      box-shadow: none !important;
+      margin: 0 !important;
+      height: auto !important;
+      padding-bottom: 0 !important;
+    }
+    .sheet:not(:first-of-type) {
+      break-before: page;
+    }
   }
 `
 
@@ -125,10 +153,12 @@ export function PrintPage() {
   const [players, setPlayers] = useState<PlayerCount>(4)
   // Each deck is chunked into pages independently, then concatenated — so a
   // partially-filled last page of one deck never shares a sheet with the
-  // next deck; the influence deck always starts on its own page.
+  // next deck; the influence and infrastructure decks each always start on
+  // their own page.
   const pages = [
-    ...chunks(expandDeck(deck, players), PER_PAGE),
-    ...chunks(expandDeck(influenceDeck, players), PER_PAGE)
+    ...chunks(expandDeck(fieldDeck, players), PER_PAGE),
+    ...chunks(expandDeck(influenceDeck, players), PER_PAGE),
+    ...chunks(expandDeck(infrastructureDeck, players), PER_PAGE)
   ]
   return (
     <>

@@ -5,29 +5,31 @@ import type { FruitColor, FruitName, PlayerCount } from "~/cards/domain"
  * incremental demand it induces elsewhere on sale (exact mechanic TBD).
  */
 export type DemandSlot = {
-  gold: number
-  inducedDemand: number
+  readonly gold: number
+  readonly inducedDemand: number
 }
 
 export type MarketStallDefinition = {
-  fruit: FruitName
-  color: FruitColor
+  readonly fruit: FruitName
+  readonly color: FruitColor
   /** Demand track, keyed by player count — slot count grows with players. */
-  demandTrack: Record<PlayerCount, readonly DemandSlot[]>
+  readonly demandTrack: Record<PlayerCount, readonly DemandSlot[]>
   /** Other fruits whose demand this one induces when sold — shown as text on the stall rather than as a board-wide arrow diagram. */
-  induces: readonly FruitName[]
+  readonly induces: readonly FruitName[]
 }
 
 /**
- * One worker up for hire on the Labor Market track: what it costs in gold to
- * take. A single dimension, unlike a fruit's `DemandSlot` — no induced
- * demand.
+ * One cost tier on the Labor Market: a group of `count` interchangeable
+ * workers, all hired for the same `gold` price. Grouping workers by price
+ * (rather than one slot per worker) keeps the track compact vertically — a
+ * tier renders its price once alongside a row of `count` token slots.
  */
-export type LaborSlot = {
-  gold: number
+export type LaborTier = {
+  readonly gold: number
+  readonly count: number
 }
 
 export type LaborMarketDefinition = {
-  /** Worker track, keyed by player count — worker count grows with players, same as MarketStallDefinition's demandTrack. */
-  workerTrack: Record<PlayerCount, readonly LaborSlot[]>
+  /** Worker cost tiers, keyed by player count — cheapest first. Both the tier count and workers-per-tier can grow with players. */
+  readonly workerTrack: Record<PlayerCount, readonly LaborTier[]>
 }

@@ -1,15 +1,16 @@
 import { Coins } from "lucide-react"
-import type { LaborSlot } from "~/board/domain"
+import type { LaborTier } from "~/board/domain"
 import { darkBand, paperFrame } from "~/components/paperFrame"
 import { icon, tokenSlot, value } from "~/components/trackSlot"
 import { css, cx } from "~/generated/styled-system/css"
 
 /**
- * The Labor Market: a vertical, single-dimension track of workers up for
- * hire, cheapest at the top and most expensive at the bottom. Slot count
- * grows with player count; rows are driven by CSS grid (`gridAutoRows: 1fr`)
- * so the track always fills the sleeve's full height, whether it holds 5
- * workers or 7.
+ * The Labor Market: workers up for hire, grouped into cost tiers (cheapest at
+ * the top, most expensive at the bottom). Each tier shows its gold price once
+ * alongside a row of `count` token slots, so a price with many workers reads
+ * as one compact group rather than a long stack of identical rows. Tiers are
+ * driven by CSS grid (`gridAutoRows: 1fr`) so they always fill the sleeve's
+ * full height, whatever the tier count.
  */
 
 const frame = css({
@@ -36,30 +37,45 @@ const track = css({
   gridAutoRows: "1fr"
 })
 
-const slot = css({
-  display: "flex",
+const tier = css({
+  display: "grid",
+  gridTemplateColumns: "auto 1fr",
   alignItems: "center",
-  justifyContent: "center",
   gap: "3",
+  paddingInline: "3",
   borderBottomWidth: "0.2mm",
   borderBottomStyle: "solid",
   borderBottomColor: "stone.400/40"
 })
 
-const lastSlot = css({ borderBottomWidth: 0 })
+const lastTier = css({ borderBottomWidth: 0 })
 
-export function LaborMarket({ slots }: { slots: readonly LaborSlot[] }) {
+// Two fixed columns; workers beyond 2 wrap onto further rows, so a tall tier
+// grows down rather than crowding a single wide line.
+const tokens = css({
+  display: "grid",
+  gridTemplateColumns: "repeat(2, auto)",
+  justifyContent: "flex-end",
+  alignContent: "center",
+  gap: "2"
+})
+
+export function LaborMarket({ tiers }: { tiers: readonly LaborTier[] }) {
   return (
     <div className={cx(frame, paperFrame({ color: "brown" }))}>
       <div className={cx(header, darkBand({ color: "brown" }))}>Labor Market</div>
       <div className={track}>
-        {slots.map((s, i) => (
-          <div key={i} className={cx(slot, i === slots.length - 1 && lastSlot)}>
-            <span className={tokenSlot({ size: "md", shape: "circle" })} />
+        {tiers.map((t, i) => (
+          <div key={i} className={cx(tier, i === tiers.length - 1 && lastTier)}>
             <span className={value}>
               <Coins className={icon} />
-              {s.gold}
+              {t.gold}
             </span>
+            <div className={tokens}>
+              {Array.from({ length: t.count }, (_, j) => (
+                <span key={j} className={tokenSlot({ size: "lg", shape: "circle" })} />
+              ))}
+            </div>
           </div>
         ))}
       </div>

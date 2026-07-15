@@ -26,24 +26,22 @@ export type FruitName = typeof FRUIT_LIST_WITH_METADATA[number]["name"]
 export type FruitColor = typeof FRUIT_LIST_WITH_METADATA[number]["color"]
 
 /**
- * The five social groups an Influence card can court. Defined here (mirroring
+ * The three social groups an Influence card can court. Defined here (mirroring
  * `FRUIT_LIST_WITH_METADATA`) so the set is single-sourced and the compiler can
  * validate every card's `group`. Name-only for now; richer per-group metadata
  * (flavor, color, icon) can be added to these entries later.
  */
 export const GROUP_LIST_WITH_METADATA = [
-  { name: "Laborers" },
-  { name: "Landowners" },
-  { name: "Politicians" },
+  { name: "Elites" },
   { name: "Merchants" },
-  { name: "Church" }
+  { name: "People" }
 ] as const
 export type GroupName = typeof GROUP_LIST_WITH_METADATA[number]["name"]
 
 /** Resource cost to play a card. Both required; 0 = none of that resource. */
 export type Cost = {
-  workers: number
-  gold: number
+  readonly workers: number
+  readonly gold: number
 }
 
 /**
@@ -52,8 +50,8 @@ export type Cost = {
  * on play, and each resource is optional (omit = none of it).
  */
 export type AdditionalCost = {
-  workers?: number
-  gold?: number
+  readonly workers?: number
+  readonly gold?: number
 }
 
 /**
@@ -72,26 +70,26 @@ export type Copies = Record<PlayerCount, number>
  * reshaping the model.
  */
 export type WorkerSlot = {
-  workers: number
-  amount: number
+  readonly workers: number
+  readonly amount: number
 }
 
 /** Intrinsic data shared by a card's definition and its physical copies. */
 export type FieldCardBase = {
-  kind: "field"
-  id: string
-  name: string
-  cost: Cost
-  fruit: FruitName
-  slots: readonly WorkerSlot[]
+  readonly kind: "field"
+  readonly id: string
+  readonly name: string
+  readonly cost: Cost
+  readonly fruit: FruitName
+  readonly slots: readonly WorkerSlot[]
 }
 
 export type FieldImprovementCardBase = {
-  kind: "field-improvement"
-  id: string
-  name: string
-  cost: Cost
-  additionalText: string
+  readonly kind: "field-improvement"
+  readonly id: string
+  readonly name: string
+  readonly cost: Cost
+  readonly additionalText: string
 }
 
 /**
@@ -102,12 +100,12 @@ export type FieldImprovementCardBase = {
  * preconditions live in `additionalText`. Each card courts exactly one `group`.
  */
 export type InfluenceCardBase = {
-  kind: "influence"
-  id: string
-  name: string
-  group: GroupName
-  additionalCost?: AdditionalCost
-  additionalText: string
+  readonly kind: "influence"
+  readonly id: string
+  readonly name: string
+  readonly group: GroupName
+  readonly additionalCost?: AdditionalCost
+  readonly additionalText: string
 }
 
 /**
@@ -117,9 +115,23 @@ export type InfluenceCardBase = {
  * mechanic is designed.
  */
 export type ElectionCardBase = {
-  kind: "election"
-  id: string
-  name: string
+  readonly kind: "election"
+  readonly id: string
+  readonly name: string
+}
+
+/**
+ * An Infrastructure card (Port, Rails, Telegraph): a buildable improvement
+ * printed on its own sheet. Shares the field-improvement template — a play
+ * `cost` in workers and gold plus freeform rules `additionalText` — and carries
+ * nothing else.
+ */
+export type InfrastructureCardBase = {
+  readonly kind: "infrastructure"
+  readonly id: string
+  readonly name: string
+  readonly cost: Cost
+  readonly additionalText: string
 }
 
 export type CardBase =
@@ -127,12 +139,13 @@ export type CardBase =
   | FieldImprovementCardBase
   | InfluenceCardBase
   | ElectionCardBase
+  | InfrastructureCardBase
 
 /**
  * A catalog entry: a card's intrinsic data plus how many copies the printed deck
  * holds at each player count. This is the authored source (see `deck.ts`).
  */
-export type CardDefinition = CardBase & { copies: Copies }
+export type CardDefinition = CardBase & { readonly copies: Copies }
 
 export type Deck = readonly CardDefinition[]
 
@@ -142,4 +155,4 @@ export type Deck = readonly CardDefinition[]
  * copy is included. A definition with copies {2:1,3:1,4:2} expands to one "2"
  * card plus, at four players, an extra "4" card. Carries no `copies`.
  */
-export type Card = CardBase & { minPlayerCount: PlayerCount }
+export type Card = CardBase & { readonly minPlayerCount: PlayerCount }

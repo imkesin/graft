@@ -23,7 +23,8 @@ export const paperFrame = cva({
       stone: { background: "stone.50", color: "stone.900", borderColor: "stone.500" },
       brown: { background: "brown.50", color: "brown.900", borderColor: "brown.500" },
       zinc: { background: "zinc.50", color: "zinc.900", borderColor: "zinc.500" },
-      cyan: { background: "cyan.50", color: "cyan.900", borderColor: "cyan.500" }
+      cyan: { background: "cyan.50", color: "cyan.900", borderColor: "cyan.500" },
+      neutral: { background: "neutral.50", color: "neutral.900", borderColor: "neutral.500" }
     }
   }
 })
@@ -40,7 +41,8 @@ export const darkBand = cva({
       stone: { background: "stone.900", color: "stone.50" },
       brown: { background: "brown.900", color: "brown.50" },
       zinc: { background: "zinc.900", color: "zinc.50" },
-      cyan: { background: "cyan.900", color: "cyan.50" }
+      cyan: { background: "cyan.900", color: "cyan.50" },
+      neutral: { background: "neutral.900", color: "neutral.50" }
     }
   }
 })
