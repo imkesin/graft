@@ -1,29 +1,4 @@
-/**
- * Card data model. The deck is a discriminated union over `kind`; each variant
- * carries its own fields. Card definitions live as typed TS literals (see
- * `deck.ts`), so the compiler validates the whole catalog at build time — there
- * is no runtime decoding step.
- */
-export const PLAYER_COUNTS = [2, 3, 4] as const
-export type PlayerCount = typeof PLAYER_COUNTS[number]
-
-/**
- * Every fruit, with the noun used for its field card and the Panda color
- * scale used to identify it wherever fruits are color-coded (e.g. market
- * stalls). `fieldName` distinguishes the small-field names ("Small Rambutan
- * Orchard" vs "Small Orange Grove").
- */
-export const FRUIT_LIST_WITH_METADATA = [
-  { name: "Rambutan", fieldName: "Orchard", color: "red" },
-  { name: "Orange", fieldName: "Grove", color: "orange" },
-  { name: "Banana", fieldName: "Plantation", color: "yellow" },
-  { name: "Lime", fieldName: "Grove", color: "lime" },
-  { name: "Coconut", fieldName: "Plantation", color: "stone" },
-  { name: "Passionfruit", fieldName: "Farm", color: "violet" },
-  { name: "Dragonfruit", fieldName: "Terraces", color: "pink" }
-] as const
-export type FruitName = typeof FRUIT_LIST_WITH_METADATA[number]["name"]
-export type FruitColor = typeof FRUIT_LIST_WITH_METADATA[number]["color"]
+import type { FruitName, PlayerCount } from "~/domain/CoreDefinitions"
 
 /**
  * The three social groups an Influence card can court. Defined here (mirroring
@@ -120,26 +95,11 @@ export type ElectionCardBase = {
   readonly name: string
 }
 
-/**
- * An Infrastructure card (Port, Rails, Telegraph): a buildable improvement
- * printed on its own sheet. Shares the field-improvement template — a play
- * `cost` in workers and gold plus freeform rules `additionalText` — and carries
- * nothing else.
- */
-export type InfrastructureCardBase = {
-  readonly kind: "infrastructure"
-  readonly id: string
-  readonly name: string
-  readonly cost: Cost
-  readonly additionalText: string
-}
-
 export type CardBase =
   | FieldCardBase
   | FieldImprovementCardBase
   | InfluenceCardBase
   | ElectionCardBase
-  | InfrastructureCardBase
 
 /**
  * A catalog entry: a card's intrinsic data plus how many copies the printed deck

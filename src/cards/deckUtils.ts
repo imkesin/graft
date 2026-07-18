@@ -1,4 +1,5 @@
-import { type Card, type Deck, PLAYER_COUNTS, type PlayerCount } from "./domain"
+import { PLAYER_COUNTS, type PlayerCount } from "~/domain/CoreDefinitions"
+import type { Card, Deck } from "./domain"
 
 /**
  * Expand the catalog into the physical deck for `players`: one entry per printed

@@ -1,8 +1,8 @@
 import { Coins, TrendingUp } from "lucide-react"
-import type { DemandSlot } from "~/board/domain"
-import type { FruitColor, FruitName } from "~/cards/domain"
 import { darkBand, paperFrame } from "~/components/paperFrame"
 import { icon, tokenSlot, value } from "~/components/trackSlot"
+import type { FruitColor, FruitName } from "~/domain/CoreDefinitions"
+import type { DemandSlot } from "~/domain/MarketDefinitions"
 import { css, cx } from "~/generated/styled-system/css"
 
 /**

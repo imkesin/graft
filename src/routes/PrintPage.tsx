@@ -1,11 +1,10 @@
 import { type CSSProperties, useState } from "react"
 import { CARD_TRIM_H_MM, CARD_TRIM_W_MM } from "~/cards/cardSize"
 import { expandDeck } from "~/cards/deckUtils"
-import type { PlayerCount } from "~/cards/domain"
 import { fieldDeck } from "~/cards/fieldDeck"
 import { influenceDeck } from "~/cards/influenceDeck"
-import { infrastructureDeck } from "~/cards/infrastructureDeck"
 import { Card } from "~/components/Card"
+import type { PlayerCount } from "~/domain/CoreDefinitions"
 import { css } from "~/generated/styled-system/css"
 
 /**
@@ -153,12 +152,10 @@ export function PrintPage() {
   const [players, setPlayers] = useState<PlayerCount>(4)
   // Each deck is chunked into pages independently, then concatenated — so a
   // partially-filled last page of one deck never shares a sheet with the
-  // next deck; the influence and infrastructure decks each always start on
-  // their own page.
+  // next deck; the influence deck always starts on its own page.
   const pages = [
     ...chunks(expandDeck(fieldDeck, players), PER_PAGE),
-    ...chunks(expandDeck(influenceDeck, players), PER_PAGE),
-    ...chunks(expandDeck(infrastructureDeck, players), PER_PAGE)
+    ...chunks(expandDeck(influenceDeck, players), PER_PAGE)
   ]
   return (
     <>

@@ -1,19 +1,9 @@
 import { Coins, PersonStanding } from "lucide-react"
 import { Fragment, type ReactNode } from "react"
-import { FRUIT_LIST_WITH_METADATA } from "~/cards/domain"
-import type {
-  Card,
-  CardBase,
-  Cost,
-  FieldCardBase,
-  FieldImprovementCardBase,
-  FruitColor,
-  FruitName,
-  InfluenceCardBase,
-  InfrastructureCardBase,
-  PlayerCount
-} from "~/cards/domain"
+import type { Card, CardBase, Cost, FieldCardBase, FieldImprovementCardBase, InfluenceCardBase } from "~/cards/domain"
 import { paperFrame } from "~/components/paperFrame"
+import { FRUIT_LIST_WITH_METADATA } from "~/domain/CoreDefinitions"
+import type { FruitColor, FruitName, PlayerCount } from "~/domain/CoreDefinitions"
 import { css, cva, cx } from "~/generated/styled-system/css"
 import { token } from "~/generated/styled-system/tokens"
 import { Guides } from "./Guides"
@@ -22,19 +12,16 @@ import { Guides } from "./Guides"
  * Field cards read as brown (fields, crops); field-improvements as stone;
  * influences as zinc — near-white, with the header/footer bands brighter
  * than the body rather than the dark-band inversion the other two kinds use.
- * Infrastructure cards read as neutral — near-black — following the same
- * dark-band inversion as field/field-improvement.
  */
 type CardKind = CardBase["kind"]
 
 // The card's base surface, by kind — the shared `paperFrame` recipe (see
-// ~/components/paperFrame) covers all five kinds with no deviation.
+// ~/components/paperFrame) covers all four kinds with no deviation.
 const KIND_PAPER_COLOR = {
   field: "brown",
   "field-improvement": "stone",
   influence: "zinc",
-  election: "cyan",
-  infrastructure: "neutral"
+  election: "cyan"
 } as const satisfies Record<CardKind, string>
 
 const FRUIT_COLOR: Record<FruitName, FruitColor> = Object.fromEntries(
@@ -47,15 +34,12 @@ const FRUIT_COLOR: Record<FruitName, FruitColor> = Object.fromEntries(
 // can't be a static Panda token — it's resolved at render time with `token()`
 // and applied as an inline `background`, overriding `darkBand`'s flat one.
 function fieldBandBackground(fruit: FruitName): string {
-  return `linear-gradient(to right, ${token(`colors.${FRUIT_COLOR[fruit]}.900`)}, ${
-    token("colors.brown.900")
-  })`
+  return `linear-gradient(to right, ${token(`colors.${FRUIT_COLOR[fruit]}.900`)}, ${token("colors.brown.900")})`
 }
 
-/** Field-improvement and infrastructure share the rules-text body layout (a
- * cost rail over a freeform text band). Influence has its own thirds layout
- * (`InfluenceBody`). */
-type TextCardBase = FieldImprovementCardBase | InfrastructureCardBase
+/** Field-improvement uses a rules-text body layout (a cost rail over a
+ * freeform text band). Influence has its own thirds layout (`InfluenceBody`). */
+type TextCardBase = FieldImprovementCardBase
 
 /**
  * A single poker card. Two render variants:
@@ -581,14 +565,11 @@ function Footer({
   )
 }
 
-function bodyRegions(
-  card: FieldCardBase | FieldImprovementCardBase | InfrastructureCardBase
-): BodyRegions {
+function bodyRegions(card: FieldCardBase | FieldImprovementCardBase): BodyRegions {
   switch (card.kind) {
     case "field":
       return fieldRegions(card)
     case "field-improvement":
-    case "infrastructure":
       return textCardRegions(card)
     default:
       return assertNever(card)

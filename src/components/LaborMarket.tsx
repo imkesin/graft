@@ -1,7 +1,7 @@
 import { Coins } from "lucide-react"
-import type { LaborTier } from "~/board/domain"
 import { darkBand, paperFrame } from "~/components/paperFrame"
 import { icon, tokenSlot, value } from "~/components/trackSlot"
+import type { LaborTier } from "~/domain/MarketDefinitions"
 import { css, cx } from "~/generated/styled-system/css"
 
 /**
@@ -72,9 +72,10 @@ export function LaborMarket({ tiers }: { tiers: readonly LaborTier[] }) {
               {t.gold}
             </span>
             <div className={tokens}>
-              {Array.from({ length: t.count }, (_, j) => (
-                <span key={j} className={tokenSlot({ size: "lg", shape: "circle" })} />
-              ))}
+              {Array.from(
+                { length: t.count },
+                (_, j) => <span key={j} className={tokenSlot({ size: "lg", shape: "circle" })} />
+              )}
             </div>
           </div>
         ))}

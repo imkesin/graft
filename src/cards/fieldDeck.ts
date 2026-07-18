@@ -1,11 +1,12 @@
-import { type Card, type CardDefinition, type Deck, FRUIT_LIST_WITH_METADATA, PLAYER_COUNTS } from "./domain"
+import { FRUIT_LIST_WITH_METADATA, PLAYER_COUNTS } from "~/domain/CoreDefinitions"
+import type { Card, CardDefinition, Deck } from "./domain"
 
 const smallFields = FRUIT_LIST_WITH_METADATA.map(({ name, fieldName }) => ({
   kind: "field",
   id: `sm-${name.toLowerCase()}-field`,
   name: `Small ${name} ${fieldName}`,
   cost: {
-    workers: 2,
+    workers: 1,
     gold: 6
   },
   copies: {
@@ -24,8 +25,8 @@ const wildFields = FRUIT_LIST_WITH_METADATA.map(({ name, fieldName }) => ({
   id: `wild-${name.toLowerCase()}-field`,
   name: `Wild ${name} ${fieldName}`,
   cost: {
-    workers: 0,
-    gold: 2
+    gold: 2,
+    workers: 0
   },
   copies: {
     2: 1,
@@ -44,8 +45,8 @@ const remoteFields = FRUIT_LIST_WITH_METADATA.map(({ name, fieldName }) => ({
   id: `remote-${name.toLowerCase()}-field`,
   name: `Remote ${name} ${fieldName}`,
   cost: {
-    workers: 2,
-    gold: 4
+    gold: 4,
+    workers: 1
   },
   copies: {
     2: 0,
@@ -63,8 +64,8 @@ const mediumFields = FRUIT_LIST_WITH_METADATA.map(({ name, fieldName }) => ({
   id: `md-${name.toLowerCase()}-field`,
   name: `Medium ${name} ${fieldName}`,
   cost: {
-    workers: 3,
-    gold: 9
+    gold: 8,
+    workers: 2
   },
   copies: {
     2: 1,
@@ -83,8 +84,8 @@ const largeFields = FRUIT_LIST_WITH_METADATA.map(({ name, fieldName }) => ({
   id: `lg-${name.toLowerCase()}-field`,
   name: `Large ${name} ${fieldName}`,
   cost: {
-    workers: 4,
-    gold: 12
+    gold: 10,
+    workers: 3
   },
   copies: {
     2: 0,
@@ -118,7 +119,7 @@ export const fieldDeck: Deck = [
       4: 3
     },
     additionalText:
-      "During a harvest, you may pay 1 gold to work one empty slot on this Field (rather than using a worker from your pool)."
+      "During a Harvest, you may pay 1 Gold to increase your Harvest Capacity by 1. The additional capacity can only be applied to the attached field."
   },
   {
     kind: "field-improvement",
@@ -133,7 +134,8 @@ export const fieldDeck: Deck = [
       3: 3,
       4: 3
     },
-    additionalText: "Whenever you sell two or more fruits from this Field, gain an additional +2 gold."
+    additionalText:
+      "Whenever you Sell, you may remove 1 fruit from this Field rather than taking it to market. If you do, collect +2 additional gold. This does not require any Transport Capacity."
   },
   {
     kind: "field-improvement",
@@ -164,7 +166,7 @@ export const fieldDeck: Deck = [
       3: 2,
       4: 3
     },
-    additionalText: "Whenever this Field is harvested with all worker slots full, it yields +1 fruit."
+    additionalText: "Whenever this Field is harvested with maximum Harvest Capacity, it yields +1 fruit."
   },
   {
     kind: "field-improvement",
@@ -180,7 +182,7 @@ export const fieldDeck: Deck = [
       4: 3
     },
     additionalText:
-      "After a worker has harvested this field, you may retain them by immediately moving them into a slot on another field. Only 1 worker may be retained this way."
+      "Whenever this Field and at least 1 other Field are Harvested in the same action, you may retain 1 worker that would otherwise be returned to the Labor Supply."
   }
 ]
 

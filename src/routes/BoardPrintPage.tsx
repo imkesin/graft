@@ -1,53 +1,88 @@
 import { useState } from "react"
 import { laborMarket } from "~/board/labor"
-import { marketStalls } from "~/board/market"
+import { marketStalls } from "~/domain/MarketDefinitions"
 import { CARD_TRIM_H_MM, CARD_TRIM_W_MM } from "~/cards/cardSize"
-import { PLAYER_COUNTS, type PlayerCount } from "~/cards/domain"
+import { InfraTrack } from "~/components/InfraTrack"
 import { LaborMarket } from "~/components/LaborMarket"
 import { MarketStall } from "~/components/MarketStall"
+import { WorkerZone } from "~/components/WorkerZone"
+import { PLAYER_COUNTS, type PlayerCount } from "~/domain/CoreDefinitions"
+import { infrastructureTracks } from "~/domain/InfrastructureDefinitions"
 import { css } from "~/generated/styled-system/css"
 
 /**
- * Full board sheet for an 18x24in print-shop sheet, printed landscape
- * (24in wide x 18in tall). A 0.5in bleed/safe margin all around leaves an
- * inscribed 23x17in board, laid out as a CSS grid whose tracks are authored
- * directly in inches:
+ * Full board sheet for an 18x24in print-shop sheet, printed landscape (24in wide
+ * x 18in tall). A 0.5in bleed/safe margin all around leaves an inscribed 23x17in
+ * board, laid out as a CSS grid.
  *
- *   columns: 6 1 3 1 3 1 3 1 4 (in)   (= 23in)
- *   rows:    5 1 8 1 2 (in)           (= 17in)
+ * Tracks are conceived in a "double-resolution" unit grid: the inscribed board
+ * is 46x34 half-inch units (1u = 0.5in), so an empty lane of size 1u is a slim
+ * 0.5in gutter — half the width of a content inch's two units. The unit counts
+ * below are authored as literal decimal inches in the styles (Panda extracts
+ * `css()` statically, so a runtime unit() helper can't be used). Content tracks
+ * take 2u per original inch; each 1u gutter surrenders 1u of "leftover" vs a
+ * full 2u lane, which the flex/TBD zone of its grid absorbs — the `market`
+ * (outer) and `emptyZone` placeholder (top band).
  *
- *   gridTemplateAreas:
- *     "cardsL .      cardM  .      emptyZone .      cardsR cardsR cardsR"
- *     ".      .      .      .      .         .      .      .      ."
- *     "market market market market market   market market .      workers"
- *     "market market market market market   market market .      ."
- *     "market market market market market   market market .      tinyZone"
+ * The board seats the game's six worker-placement zones (one per Focus) as far
+ * apart as the sheet allows, pairing each with the supply it draws on. The
+ * bottom band holds the three economy engines (a track + its zone); the top band
+ * holds the three card/field actions (a card supply stacked over its zone, or
+ * just a zone where there's no supply):
  *
- *   The column tracks are the union of the top band's card zones
- *   (6/1/3/1/3/1/8) and the bottom's market/workers split (18/1/4).
+ *     bottom-left  Infrastructure track  + Invest zone
+ *     bottom-mid   Market ellipse        + Sell zone (dead centre)
+ *     bottom-right Labor Market track    + Recruit zone
+ *     top-left     Influence Card supply + Influence zone
+ *     top-mid      (no supply)             Harvest zone
+ *     top-right    Expansion Card supply + Expand zone
  *
- *   - `market`: bottom-left 18x11in block (cols 1-7, spanning all three bottom
- *     rows), the 7 MarketStalls on an ellipse (kept upright for legibility).
- *   - `workers`: bottom-right 4x8in column — a dashed recruiting station with a
- *     1in token-staging lane on the left and the Labor Market track filling the
- *     rest.
- *   - `tinyZone`: 4x2in placeholder in the bottom-right corner, split from
- *     `workers` by a 1in buffer row; content TBD.
- *   - `cardsL`: 6in zone, two spread card outlines. `cardM`: 3in zone, one
- *     centered card. `cardsR`: 8in zone, three evenly-spread cards.
- *   - `emptyZone`: 3x4in outlined placeholder; content TBD.
- *   - The `1in` buffer columns and the `1in` buffer row are real empty grid
+ * The top and bottom bands have DIFFERENT column needs, so they don't share
+ * tracks: the outer grid's columns serve only the bottom band, and the top band
+ * (`topBand`) is a nested full-width grid with its own columns.
+ *
+ *   outer columns (u): 5 1 34 1 5  (= 46u = 23in)  [infra gutter market gutter workers]
+ *   outer rows (u):    11 1 17 1 4  (= 34u = 17in)
+ *                        (market spans the bottom three rows = 22u = 11in)
+ *
+ *   outer gridTemplateAreas:
+ *     "topBand topBand topBand topBand topBand"
+ *     ".       .      .      .      ."
+ *     "infra   .      market .      workers"
+ *     "infra   .      market .      workers"
+ *     "infra   .      market .      workers"
+ *
+ *   `topBand` spans the full 46u top row and holds its own grid:
+ *     top columns (u): 12 1 14 1 18  (= 46u = 23in)
+ *     top areas:   "cardsL . harvest . cardsR"
+ *
+ *   - `infra`: bottom-left 2.5x11in (5u-wide) column spanning all three bottom
+ *     rows, holding the infrastructure upgrade tracks (Ports/Railways) stacked
+ *     evenly with the Invest zone tucked below them, framed together. Separated
+ *     from the market by a 1u (0.5in) gutter.
+ *   - `market`: bottom 17x11in block (col 3, spanning all three bottom rows),
+ *     the 7 MarketStalls on an ellipse (kept upright for legibility) with the
+ *     Sell zone at its centre. Ellipse is deliberately not yet re-fit to the
+ *     narrower cell.
+ *   - `workers`: bottom-right 2.5x11in (5u-wide) column spanning all three bottom
+ *     rows, holding the Labor Market with the Recruit zone tucked below it,
+ *     framed together.
+ *   - `cardsL`: 6in column — two Influence Card outlines over the Influence zone.
+ *     `cardsR`: 9in column — three Expansion Card outlines over the Expand
+ *     zone (Influence:Expand = 2:3). `harvest`: 7in column centring the
+ *     (supply-less) Harvest zone, absorbing the leftover width.
+ *   - The 1u buffer columns/gutter and the 1u buffer rows are real empty grid
  *     cells, so `gap` is 0.
  *
  * RADIUS_X/Y are sized against MarketStall's measured footprint at 4 players
  * (7 demand slots, its widest case: ~100x56mm) so the ring inscribes the
- * 18x11in (457x279mm) market cell with a few mm of clearance. With 7 stalls
+ * ~19x11in market cell with a few mm of clearance. With 7 stalls
  * anchored at the top vertex the ring's vertical extremes are asymmetric
  * (top sin=-1.0, bottom sin=+0.90), so OFFSET_Y nudges it down to visually
  * center the ellipse within the cell.
  */
 
-const RADIUS_X = 175
+const RADIUS_X = 160
 const RADIUS_Y = 110
 const OFFSET_Y = 5
 const STALL_COUNT = 7
@@ -98,27 +133,57 @@ const sheetStyle = css({
   boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
   flex: "none",
   display: "grid",
-  gridTemplateColumns: "6in 1in 3in 1in 3in 1in 3in 1in 4in",
-  gridTemplateRows: "5in 1in 8in 1in 2in",
-  gridTemplateAreas: `"cardsL . cardM . emptyZone . cardsR cardsR cardsR" ". . . . . . . . ." "market market market market market market market . workers" "market market market market market market market . ." "market market market market market market market . tinyZone"`,
+  gridTemplateColumns: "2.5in 0.5in 17in 0.5in 2.5in",
+  gridTemplateRows: "5.5in 0.5in 8.5in 0.5in 2in",
+  gridTemplateAreas:
+    `"topBand topBand topBand topBand topBand" ". . . . ." "infra . market . workers" "infra . market . workers" "infra . market . workers"`,
   gap: 0,
   padding: "0.5in"
 })
 
-// Cards sit at the top of each box; the space left below is intentional, so
-// hired workers can be placed onto the card once it's in play.
-const cardRow = {
-  display: "flex",
-  alignItems: "flex-start",
-  paddingTop: "3mm",
-  border: "0.3mm dashed",
-  borderColor: "stone.400",
+// The top band is its own full-width (46u) grid, independent of the bottom's
+// gutter/market/workers tracks, so the card columns keep their width regardless
+// of the narrower bottom-corner cells below them.
+const topBandArea = css({
+  gridArea: "topBand",
+  display: "grid",
+  gridTemplateColumns: "6in 0.5in 7in 0.5in 9in",
+  gridTemplateAreas: `"cardsL . harvest . cardsR"`,
+  gap: 0
+})
+
+// A barely-there dotted frame around each region cell — a development aid for
+// eyeballing the layout; intended to be removed once the board is finalised.
+const devOutline = {
+  border: "0.3mm dotted",
+  borderColor: "stone.200",
   borderRadius: "card"
 } as const
 
-const cardsLArea = css({ ...cardRow, gridArea: "cardsL", justifyContent: "space-evenly" })
-const cardMArea = css({ ...cardRow, gridArea: "cardM", justifyContent: "center" })
-const cardsRArea = css({ ...cardRow, gridArea: "cardsR", justifyContent: "space-evenly" })
+// Each card action stacks its face-up supply over its worker zone: the card row
+// sits at the top of the 5.5in band, the labelled WorkerZone tucks in below.
+const cardStack = {
+  ...devOutline,
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  gap: "5mm",
+  paddingTop: "3mm"
+} as const
+
+const cardsLArea = css({ ...cardStack, gridArea: "cardsL" })
+const cardsRArea = css({ ...cardStack, gridArea: "cardsR" })
+
+// Harvest has no board supply, so its column just centres the bare zone.
+const harvestArea = css({
+  ...devOutline,
+  gridArea: "harvest",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center"
+})
+
+const supplyRow = css({ display: "flex", justifyContent: "center", gap: "8mm" })
 
 const cardOutline = css({
   flexShrink: 0,
@@ -134,32 +199,40 @@ const cardOutline = css({
 
 const cardOutlineSize = { width: `${CARD_TRIM_W}mm`, height: `${CARD_TRIM_H}mm` }
 
-const placeholderBox = {
-  border: "0.3mm dashed",
-  borderColor: "stone.400",
-  borderRadius: "card",
+// The bottom-corner zone cells just centre a labelled WorkerZone. No outline of
+// their own — they sit inside the infra/workers column, which frames them.
+const zoneCell = css({
   display: "flex",
   alignItems: "center",
-  justifyContent: "center",
-  color: "stone.400",
-  fontSize: "micro"
-} as const
+  justifyContent: "center"
+})
 
-const emptyZoneArea = css({ ...placeholderBox, gridArea: "emptyZone" })
-const tinyZoneArea = css({ ...placeholderBox, gridArea: "tinyZone" })
+// The infra and workers columns each span the full 11in bottom band, framing
+// their track (top) and its worker zone (bottom, ~1.5in) as one dev-outlined
+// region. `1fr auto` lets the track fill and the zone take its natural height.
+const infraArea = css({
+  ...devOutline,
+  gridArea: "infra",
+  display: "grid",
+  gridTemplateRows: "1fr auto",
+  gap: "0.25in"
+})
 
-// The Labor Market's cell is a dashed "recruiting station": a 1in lane on the
-// left is left open for players to drop tokens when hiring, and the Labor
-// Market component fills the remaining width to its right.
 const workersArea = css({
+  ...devOutline,
   gridArea: "workers",
   display: "grid",
-  gridTemplateColumns: "1in 1fr",
-  gap: "2mm",
-  padding: "2mm",
-  border: "0.3mm dashed",
-  borderColor: "stone.400",
-  borderRadius: "card"
+  gridTemplateRows: "1fr auto",
+  gap: "0.25in"
+})
+
+// The infrastructure tracks stack vertically, filling the infra column's track
+// region evenly however many there are; each carries its own frame.
+const infraTracks = css({
+  display: "grid",
+  gridAutoRows: "1fr",
+  gap: "0.25in",
+  minHeight: 0
 })
 
 const gameArea = css({
@@ -200,32 +273,54 @@ export function BoardPrintPage() {
           </label>
         </div>
         <div className={`sheet ${sheetStyle}`}>
-          <div className={cardsLArea}>
-            {Array.from({ length: 2 }, (_, i) => (
-              <div key={i} className={cardOutline} style={cardOutlineSize}>
-                Card
+          <div className={topBandArea}>
+            <div className={cardsLArea}>
+              <div className={supplyRow}>
+                {Array.from({ length: 2 }, (_, i) => (
+                  <div key={i} className={cardOutline} style={cardOutlineSize}>
+                    Influence
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-          <div className={cardMArea}>
-            <div className={cardOutline} style={cardOutlineSize}>
-              Card
+              <WorkerZone label="Influence" />
+            </div>
+            <div className={harvestArea}>
+              <WorkerZone label="Harvest" />
+            </div>
+            <div className={cardsRArea}>
+              <div className={supplyRow}>
+                {Array.from({ length: 3 }, (_, i) => (
+                  <div key={i} className={cardOutline} style={cardOutlineSize}>
+                    Expansion
+                  </div>
+                ))}
+              </div>
+              <WorkerZone label="Expand" />
             </div>
           </div>
-          <div className={emptyZoneArea} />
-          <div className={cardsRArea}>
-            {Array.from({ length: 3 }, (_, i) => (
-              <div key={i} className={cardOutline} style={cardOutlineSize}>
-                Card
-              </div>
-            ))}
-          </div>
           <div className={workersArea}>
-            <div />
             <LaborMarket tiers={laborMarket.workerTrack[players]} />
+            <div className={zoneCell}>
+              <WorkerZone label="Recruit" />
+            </div>
           </div>
-          <div className={tinyZoneArea} />
+          <div className={infraArea}>
+            <div className={infraTracks}>
+              {infrastructureTracks.map((infra) => (
+                <InfraTrack key={infra.kind} kind={infra.kind} levels={infra.levels} />
+              ))}
+            </div>
+            <div className={zoneCell}>
+              <WorkerZone label="Invest" />
+            </div>
+          </div>
           <div className={gameArea}>
+            <div
+              className={stallWrap}
+              style={{ left: "50%", top: `calc(50% + ${OFFSET_Y}mm)` }}
+            >
+              <WorkerZone label="Sell" />
+            </div>
             {stalls.map((stall, i) => {
               const theta = (-90 + (i * 360) / STALL_COUNT) * (Math.PI / 180)
               const x = RADIUS_X * Math.cos(theta)

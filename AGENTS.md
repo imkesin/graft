@@ -1,8 +1,11 @@
 # Graft
 
+This project defines a "Print and Play" version of the prototype board game Graft.
+
 ## Styling
 
-- Always lean into the CSS grid for layout, even if it requires many rows and columns; `grid-template-areas` is your friend.
+- Always lean into the CSS grid for layout, even if it requires many rows and columns;
+  `grid-template-areas` is your friend.
 
 ## Commits
 

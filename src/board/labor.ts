@@ -1,10 +1,10 @@
-import type { LaborMarketDefinition } from "./domain"
+import type { LaborMarketDefinition } from "~/domain/MarketDefinitions"
 
 /**
  * Placeholder worker cost escalation, grouped into cost tiers: cheapest tier
  * first, most expensive last, `count` workers available at each price. Total
  * workers (and often the number of tiers) grows with player count, mirroring
- * the fruit demand tracks in `market.ts`. Hand-edit `gold`/`count` directly,
+ * the fruit demand tracks in `~/domain/MarketDefinitions`. Hand-edit `gold`/`count` directly,
  * or add/remove tiers.
  */
 export const laborMarket: LaborMarketDefinition = {

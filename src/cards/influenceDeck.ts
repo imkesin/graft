@@ -20,24 +20,18 @@ const influences = [
     id: "investor",
     name: "Investor",
     group: "Elites",
-    additionalCost: {
-      gold: 5
-    },
     copies: influenceCopies,
-    additionalText: "Control 2 or more Infrastructure cards, and more than any other player."
+    additionalText:
+      "Upgrade infrastructure. All types must be at least level 3. You do not receive the immediate bonus associated with the upgrade."
   },
   {
     kind: "influence",
     id: "expansion",
     name: "Land Dominance",
     group: "Elites",
-    additionalCost: {
-      workers: 1,
-      gold: 5
-    },
     copies: influenceCopies,
     additionalText:
-      "Construct a field. This must be at least your 4th field, and you must have more fields than any other player."
+      "Cultivate a Field. This must be at least your 4th Field, and you must have more Fields than any other player.\n\nAs an additional cost, discard 1 Field Card from your hand. And, for each copy of this Influence Card already in play, you must discard 1 additional Field Card."
   },
   {
     kind: "influence",
@@ -46,32 +40,25 @@ const influences = [
     group: "Merchants",
     copies: influenceCopies,
     additionalText:
-      "Sell 3 fruits that are adjacent in the market in a single trip. For each copy of this Influence card in play, you must sell an additional adjacent fruit.\n\nEach fruit sold for this way induces 1 less demand and earns 1 less gold than usual."
+      "Sell 3 Fruits that are adjacent in the market in a single trip. For each copy of this Influence Card in play, you must sell an additional adjacent Fruit.\n\nDo not collect Gold or induce demand in the sale."
   },
   {
     kind: "influence",
     id: "concentrated-sale",
     name: "Concentrated Sale",
     group: "Merchants",
-    additionalCost: {
-      gold: 1
-    },
     copies: influenceCopies,
     additionalText:
-      "Sell into a single fruit's demand until it is fully saturated. Each fruit sold for this Influence card induces 1 less demand than usual."
+      "Sell 2 or more Fruits of a single type and fill their demand track. For each copy of this Influence Card already in play, you must satisfy the requirement for an additional type of fruit.\n\nDo not collect Gold or induce demand in the sale."
   },
   {
     kind: "influence",
     id: "improved-labor-standards",
     name: "Improved Labor Standards",
     group: "People",
-    additionalCost: {
-      workers: 1,
-      gold: 2
-    },
     copies: influenceCopies,
     additionalText:
-      "No special prerequisites.\n\nYou must pay +1 additional gold when hiring a worker. This effect is permanent."
+      "After recruiting workers, you must now employ at least twice as many workers as the next largest employer. Then, pay an additional 1 Gold for each worker you employ and return them all to the Labor Supply. For each copy of this Influence Card already in play, you must pay an additional 1 Gold for each worker returned."
   },
   {
     kind: "influence",
@@ -84,7 +71,7 @@ const influences = [
     },
     copies: influenceCopies,
     additionalText:
-      "You must have harvested 5+ fruits on this turn.\n\nDiscard 2 of the harvested fruits. All other players (in order) may immediately harvest; this does not count as their turn."
+      "You must have harvested 5 or more fruits on this turn. Then, return 2 of the harvested fruits to Supply. For each copy of this influence card already in play, you must harvest an additional fruit and return it to Supply."
   }
 ] satisfies ReadonlyArray<CardDefinition>
 

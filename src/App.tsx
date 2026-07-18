@@ -1,18 +1,16 @@
 import { useEffect, useState } from "react"
-import { marketStalls } from "~/board/market"
-import { type FruitName, PLAYER_COUNTS, type PlayerCount } from "~/cards/domain"
+import { marketStalls } from "~/domain/MarketDefinitions"
 import { fieldDeck, previewCard } from "~/cards/fieldDeck"
 import { influenceDeck } from "~/cards/influenceDeck"
-import { infrastructureDeck } from "~/cards/infrastructureDeck"
 import { Card } from "~/components/Card"
 import { MarketStall } from "~/components/MarketStall"
 import { ZoomControl } from "~/components/ZoomControl"
+import { type FruitName, PLAYER_COUNTS, type PlayerCount } from "~/domain/CoreDefinitions"
 import { css } from "~/generated/styled-system/css"
 
 const allCards = [
   ...fieldDeck,
-  ...influenceDeck,
-  ...infrastructureDeck
+  ...influenceDeck
 ]
 
 const page = css({
