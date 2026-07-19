@@ -31,7 +31,7 @@ export const FOCUS_ACTION_METADATA = {
         id: "harvest-harvest",
         name: "Harvest",
         ruleDescription:
-          "Produce 1 or more Fruit Crates from your Fields, leaving each Crate on the Field that produced it. You have a baseline Harvest Capacity of 1, and each additional worker applied to this action increases this capacity by 1.\n\nHarvest Slots must be worked from top to bottom and do not produce any Fruit Crates when partially filled.\n\nA field with any number of Fruit Crates already on it may not be Harvested; they must be taken to market."
+          "Produce 1 or more Fruits from your Fields, leaving each on the Field that produced it. You have a baseline Harvest Capacity of 1, and each additional worker applied to this action increases capacity by 1.\n\nHarvest Rows must be worked from top to bottom and do not produce any Fruit when partially filled.\n\nA field with any number of Fruits already on it may not be Harvested; they must be taken to market."
       }
     ]
   },

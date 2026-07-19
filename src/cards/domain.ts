@@ -20,16 +20,6 @@ export type Cost = {
 }
 
 /**
- * Resources spent to FULFILL an Influence card (not to acquire it — acquisition is
- * a flat, off-card price). Distinct from `Cost`: it is paid at completion, not
- * on play, and each resource is optional (omit = none of it).
- */
-export type AdditionalCost = {
-  readonly workers?: number
-  readonly gold?: number
-}
-
-/**
  * Copies present in the printed deck, keyed by player count. Every count is
  * required so omissions are impossible; 0 means the card is absent at that
  * count.
@@ -70,16 +60,15 @@ export type FieldImprovementCardBase = {
 /**
  * A personal goal card, drafted from its own shared Influence deck rather than
  * the Field/Field-improvement deck. Unlike the other kinds it carries no play
- * `cost`: you acquire it (flat off-card price) and later fulfill it. Fulfilling
- * may demand `additionalCost` (optional); the goal itself and any timing
- * preconditions live in `additionalText`. Each card courts exactly one `group`.
+ * `cost`: you acquire it (flat off-card price) and later fulfill it. The goal
+ * itself and any timing preconditions live in `additionalText`. Each card
+ * courts exactly one `group`.
  */
 export type InfluenceCardBase = {
   readonly kind: "influence"
   readonly id: string
   readonly name: string
   readonly group: GroupName
-  readonly additionalCost?: AdditionalCost
   readonly additionalText: string
 }
 

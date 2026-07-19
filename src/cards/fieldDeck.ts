@@ -119,7 +119,7 @@ export const fieldDeck: Deck = [
       4: 3
     },
     additionalText:
-      "During a Harvest, you may pay 1 Gold to increase your Harvest Capacity by 1. The additional capacity can only be applied to the attached field."
+      "During a Harvest, you may pay 1 Gold to increase your Harvest Capacity by 1. The additional capacity can only be applied to rows on the attached Field."
   },
   {
     kind: "field-improvement",
@@ -135,7 +135,7 @@ export const fieldDeck: Deck = [
       4: 3
     },
     additionalText:
-      "Whenever you Sell, you may remove 1 fruit from this Field rather than taking it to market. If you do, collect +2 additional gold. This does not require any Transport Capacity."
+      "Whenever you Sell, you may remove 1 Fruit from this Field rather than taking it to market. If you do, collect 2 Gold. This does not require any Transport Capacity."
   },
   {
     kind: "field-improvement",
@@ -151,7 +151,7 @@ export const fieldDeck: Deck = [
       4: 3
     },
     additionalText:
-      "When fruit harvested from this Field is sold in the market, collect +3 additional gold.\n\nA field improved this way cannot produce more than 1 fruit per harvest."
+      "When Fruit harvested from this Field is sold in the market, collect 3 additional Gold.\n\nA Field improved this way cannot produce more than 1 Fruit per Harvest."
   },
   {
     kind: "field-improvement",
@@ -166,7 +166,8 @@ export const fieldDeck: Deck = [
       3: 2,
       4: 3
     },
-    additionalText: "Whenever this Field is harvested with maximum Harvest Capacity, it yields 1 additional Fruit."
+    additionalText:
+      "Whenever this Field is harvested with using all rows, it yields 1 additional Fruit of the same type."
   },
   {
     kind: "field-improvement",
@@ -182,7 +183,7 @@ export const fieldDeck: Deck = [
       4: 3
     },
     additionalText:
-      "Whenever this Field and at least 1 other Field are harvested with maximum Harvest Capacity, you may retain 1 worker that would otherwise be returned to the Labor Supply."
+      "Whenever this Field and at least 1 other Field are harvested using all rows, you may retain 1 Worker that would otherwise be returned to the Labor Supply."
   }
 ]
 

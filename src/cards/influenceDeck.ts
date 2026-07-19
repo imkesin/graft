@@ -9,9 +9,9 @@ import type { CardDefinition, Deck } from "./domain"
  */
 
 const influenceCopies = {
-  2: 3,
-  3: 4,
-  4: 5
+  2: 2,
+  3: 3,
+  4: 4
 } as const
 
 const influences = [
@@ -22,7 +22,7 @@ const influences = [
     group: "Elites",
     copies: influenceCopies,
     additionalText:
-      "Upgrade infrastructure. All types must be at least level 3. You do not receive the immediate bonus associated with the upgrade."
+      "Upgrade infrastructure such that all types are at least level 3.\n\nYou do not receive the immediate bonus associated with the upgrade."
   },
   {
     kind: "influence",
@@ -31,7 +31,7 @@ const influences = [
     group: "Elites",
     copies: influenceCopies,
     additionalText:
-      "Cultivate a Field. This must be at least your 4th Field, and you must have more Fields than any other player.\n\nAs an additional cost, discard 1 Field Card from your hand. And, for each copy of this Influence Card already in play, you must discard 1 additional Field Card."
+      "Cultivate a Field. This must be at least your 4th Field, and you must have more Fields than any other Player.\n\nAs an additional cost, discard 1 Field Card from your hand. And, for each copy of this Influence Card already in play, you must discard 1 additional Field Card."
   },
   {
     kind: "influence",
@@ -40,7 +40,7 @@ const influences = [
     group: "Merchants",
     copies: influenceCopies,
     additionalText:
-      "Sell 3 Fruits that are adjacent in the market in a single trip. For each copy of this Influence Card in play, you must sell an additional adjacent Fruit.\n\nDo not collect Gold or induce demand in the sale."
+      "Sell 3 Fruits that are adjacent in the Market in a single trip. For each copy of this Influence Card in play, you must sell an additional adjacent Fruit.\n\nDo not collect Gold or induce demand for this sale."
   },
   {
     kind: "influence",
@@ -49,7 +49,7 @@ const influences = [
     group: "Merchants",
     copies: influenceCopies,
     additionalText:
-      "Sell 2 or more Fruits of a single type and fill their demand track. For each copy of this Influence Card already in play, you must satisfy the requirement for an additional type of fruit.\n\nDo not collect Gold or induce demand in the sale."
+      "Sell at least 3 Fruits of a single type and fill its demand track. For each copy of this Influence Card already in play, you must sell an additional Fruit of that type.\n\nDo not collect Gold or induce demand in the sale."
   },
   {
     kind: "influence",
@@ -58,20 +58,16 @@ const influences = [
     group: "People",
     copies: influenceCopies,
     additionalText:
-      "After recruiting workers, you must now employ at least twice as many workers as the next largest employer. Then, pay an additional 1 Gold for each worker you employ and return them all to the Labor Supply. For each copy of this Influence Card already in play, you must pay an additional 1 Gold for each worker returned."
+      "After recruiting, the Labor Supply must be empty and you must employ more Workers than any other Player. Then, return all Workers you control to the labor supply.\n\nFor each copy of this Influence Card already in play, you must pay an additional 1 Gold for each Worker returned this way."
   },
   {
     kind: "influence",
     id: "harvest-festival",
     name: "Harvest Festival",
     group: "People",
-    additionalCost: {
-      workers: 1,
-      gold: 4
-    },
     copies: influenceCopies,
     additionalText:
-      "You must have harvested 5 or more fruits on this turn. Then, return 2 of the harvested fruits to Supply. For each copy of this influence card already in play, you must harvest an additional fruit and return it to Supply."
+      "You must have harvested at least 5 Fruit on this turn. Then, return 2 of the Fruit to Supply.\n\nFor each copy of this influence card already in play, you must harvest an additional fruit and return an additional Fruit to Supply."
   }
 ] satisfies ReadonlyArray<CardDefinition>
 
@@ -81,9 +77,9 @@ const elections = [
     id: "election",
     name: "Election",
     copies: {
-      2: 4,
-      3: 5,
-      4: 6
+      2: 3,
+      3: 4,
+      4: 5
     }
   }
 ] satisfies ReadonlyArray<CardDefinition>

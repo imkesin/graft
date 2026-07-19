@@ -470,16 +470,9 @@ function textCardRegions(card: TextCardBase): BodyRegions {
 }
 
 function InfluenceBody({ card }: { card: InfluenceCardBase }) {
-  const workers = card.additionalCost?.workers ?? 0
-  const gold = card.additionalCost?.gold ?? 0
-
   return (
     <div className={influenceBody}>
       <div className={influenceArt} />
-      <div className={costRail}>
-        {gold > 0 && <GoldCost amount={gold} />}
-        {workers > 0 && <WorkerCost amount={workers} />}
-      </div>
       <div className={influenceBand}>
         <div className={influenceGoalContent}>
           <span className={influenceGroupName}>{card.group}</span>
