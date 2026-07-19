@@ -40,3 +40,12 @@ export const FRUIT_LIST_WITH_METADATA = [
 ] as const
 export type FruitName = typeof FRUIT_LIST_WITH_METADATA[number]["name"]
 export type FruitColor = typeof FRUIT_LIST_WITH_METADATA[number]["color"]
+
+/**
+ * Fruit → its own token/crate colour, derived once from the metadata list.
+ * The lone cast is unavoidable: `Object.fromEntries` widens keys to `string`,
+ * but the entries come straight from the typed list so the map is total.
+ */
+export const FRUIT_COLOR: Record<FruitName, FruitColor> = Object.fromEntries(
+  FRUIT_LIST_WITH_METADATA.map((f) => [f.name, f.color])
+) as Record<FruitName, FruitColor>

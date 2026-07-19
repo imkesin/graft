@@ -1,18 +1,19 @@
 import { useEffect, useState } from "react"
 import { fieldDeck, previewCard } from "~/cards/fieldDeck"
 import { influenceDeck } from "~/cards/influenceDeck"
+import { AnotherTurn } from "~/components/benefits/AnotherTurn"
 import { OverflowSlot } from "~/components/benefits/OverflowSlot"
+import { TransportCapacityIncrease } from "~/components/benefits/TransportCapacityIncrease"
 import { Card } from "~/components/Card"
 import { FieldDiscard } from "~/components/icons/FieldDiscard"
 import { GoldCost } from "~/components/icons/GoldCost"
 import { InducedDemand } from "~/components/icons/InducedDemand"
-import { TransportCapacity } from "~/components/icons/TransportCapacity"
 import { WorkerCost } from "~/components/icons/WorkerCost"
 import { MarketStall } from "~/components/MarketStall"
 import { FruitCrateSlot } from "~/components/slots/FruitCrateSlot"
 import { WorkerSlot } from "~/components/slots/WorkerSlot"
 import { ZoomControl } from "~/components/ZoomControl"
-import { FRUIT_LIST_WITH_METADATA, type FruitName, PLAYER_COUNTS, type PlayerCount } from "~/domain/CoreDefinitions"
+import { FRUIT_LIST_WITH_METADATA, type FruitName } from "~/domain/CoreDefinitions"
 import { marketStalls } from "~/domain/MarketDefinitions"
 import { css } from "~/generated/styled-system/css"
 
@@ -46,7 +47,6 @@ export function App() {
   const [selectedId, setSelectedId] = useState(allCards[0]?.id)
   const selected = allCards.find((card) => card.id === selectedId) ?? allCards[0]
   const [stallFruit, setStallFruit] = useState(marketStalls[0]?.fruit)
-  const [stallPlayers, setStallPlayers] = useState<PlayerCount>(4)
   const selectedStall = marketStalls.find((s) => s.fruit === stallFruit) ?? marketStalls[0]
 
   // `--u` must live on the root: Panda hoists the card-unit tokens to `:root`,
@@ -83,22 +83,11 @@ export function App() {
           </option>
         ))}
       </select>
-      <select
-        className={select}
-        value={stallPlayers}
-        onChange={(e) => setStallPlayers(Number(e.target.value) as PlayerCount)}
-      >
-        {PLAYER_COUNTS.map((n) => (
-          <option key={n} value={n}>
-            {n} players
-          </option>
-        ))}
-      </select>
       {selectedStall && (
         <MarketStall
           fruit={selectedStall.fruit}
           color={selectedStall.color}
-          slots={selectedStall.demandTrack[stallPlayers]}
+          columns={selectedStall.demandColumns}
           induces={selectedStall.induces}
         />
       )}
@@ -128,9 +117,13 @@ export function App() {
         <OverflowSlot amount={5} />
       </div>
       <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
-        <TransportCapacity amount={1} />
-        <TransportCapacity amount={2} />
-        <TransportCapacity amount={3} />
+        <TransportCapacityIncrease amount={1} />
+        <TransportCapacityIncrease amount={2} />
+        <TransportCapacityIncrease amount={3} />
+      </div>
+      <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+        <AnotherTurn amount={1} />
+        <AnotherTurn amount={2} />
       </div>
       <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
         {FRUIT_LIST_WITH_METADATA.map((f) => <FruitCrateSlot key={f.name} color={f.color} letter={f.name.charAt(0)} />)}

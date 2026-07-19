@@ -12,6 +12,10 @@ import { css } from "~/generated/styled-system/css"
  * recipe that every card and stall already uses. Drawn as inline SVG so it stays
  * print-crisp and scales with `--u`; the real `<TrendingUp>` is nested as a
  * positioned inner svg so we build directly on the Lucide icon.
+ *
+ * Omit `amount` for a numberless glyph — the bare triangle-with-trend mark, used
+ * as a heading for "which fruits this induces" (see MarketStall's induces panel).
+ * `size` (card units) shrinks it for that heading use.
  */
 
 // Geometry in the 0..10 viewBox (1 unit = 1mm at print).
@@ -42,13 +46,17 @@ const IY = 6.1
 
 const badge = css({ display: "block", width: "10", height: "10" })
 
-export function InducedDemand({ amount, className }: { amount: number; className?: string }) {
+export function InducedDemand({ amount, size, className }: { amount?: number; size?: number; className?: string }) {
+  // `size` (in card units) overrides the default 10u box via inline style,
+  // which reliably wins over the `badge` class regardless of stylesheet order.
+  const sizeStyle = size ? { width: `calc(${size} * var(--u))`, height: `calc(${size} * var(--u))` } : undefined
   return (
     <svg
       className={className ? `${badge} ${className}` : badge}
+      style={sizeStyle}
       viewBox="0 0 10 10"
       role="img"
-      aria-label={`induces ${amount} demand`}
+      aria-label={amount === undefined ? "induces demand" : `induces ${amount} demand`}
     >
       {/* Light triangle body. */}
       <path d={TRIANGLE} fill="var(--colors-slate-100)" />
@@ -70,18 +78,20 @@ export function InducedDemand({ amount, className }: { amount: number; className
         color="white"
         strokeWidth={3}
       />
-      <text
-        x={APEX_X}
-        y={NUM_Y}
-        textAnchor="middle"
-        dominantBaseline="central"
-        fontSize={FONT}
-        fontWeight={700}
-        fill="var(--colors-slate-950)"
-        style={{ fontVariantNumeric: "tabular-nums" }}
-      >
-        {amount}
-      </text>
+      {amount !== undefined && (
+        <text
+          x={APEX_X}
+          y={NUM_Y}
+          textAnchor="middle"
+          dominantBaseline="central"
+          fontSize={FONT}
+          fontWeight={700}
+          fill="var(--colors-slate-950)"
+          style={{ fontVariantNumeric: "tabular-nums" }}
+        >
+          {amount}
+        </text>
+      )}
     </svg>
   )
 }

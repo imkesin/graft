@@ -1,8 +1,9 @@
 import { Fragment } from "react"
+import { AnotherTurn } from "~/components/benefits/AnotherTurn"
 import { OverflowSlot } from "~/components/benefits/OverflowSlot"
+import { TransportCapacityIncrease } from "~/components/benefits/TransportCapacityIncrease"
 import { FieldDiscard } from "~/components/icons/FieldDiscard"
 import { GoldCost } from "~/components/icons/GoldCost"
-import { TransportCapacity } from "~/components/icons/TransportCapacity"
 import { WorkerCost } from "~/components/icons/WorkerCost"
 import { WorkerRemove } from "~/components/icons/WorkerRemove"
 import { darkBand, paperFrame } from "~/components/paperFrame"
@@ -45,13 +46,14 @@ const header = css({
   paddingBlock: "1"
 })
 
-// One 2-column grid for the whole ladder: cost (auto, as narrow as its badges)
-// on the left, payoff (1fr) on the right. Running the levels through a single
-// grid — rather than one grid per row — lets the payoff cells' shared left
-// border stack into a continuous vertical divider between the two zones.
+// One 3-column grid for the whole ladder: cost (auto, as narrow as its badges)
+// on the left, then the immediate "take another turn" bonus (auto), then the
+// common payoff (1fr) filling the rest. Running the levels through a single
+// grid — rather than one grid per row — lets each column's shared left border
+// stack into a continuous vertical divider between adjacent zones.
 const track = css({
   display: "grid",
-  gridTemplateColumns: "auto 1fr",
+  gridTemplateColumns: "auto auto 1fr",
   gridAutoRows: "1fr",
   minHeight: 0
 })
@@ -59,7 +61,7 @@ const track = css({
 const rowBorder = {
   borderBottomWidth: "0.2mm",
   borderBottomStyle: "solid",
-  borderBottomColor: "stone.400/40"
+  borderBottomColor: "stone.400/60"
 } as const
 
 // Cost column: the badge boxes sit side by side (gold, workers, discard).
@@ -87,9 +89,26 @@ const badgeBox = css({
   flexShrink: 0
 })
 
-// Payoff column: its left border is the continuous divider between cost and
-// payoff (the stacked cells share one vertical line).
+// Common payoff column: a faint left border sets it apart from the immediate
+// "take another turn" bonus to its left; the stacked cells share that one
+// continuous vertical rule.
 const payoff = css({
+  ...rowBorder,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  paddingInline: "2",
+  paddingBlock: "1",
+  borderLeftWidth: "0.2mm",
+  borderLeftStyle: "solid",
+  borderLeftColor: "stone.400/20"
+})
+
+// "Take another turn" column: an immediate build bonus sitting just left of the
+// common payoff. Its bold left border is the continuous cost|payoff divider (the
+// stacked cells share one vertical line). Reserves its width even on the levels
+// that grant no extra turn, so both it and the divider stay unbroken.
+const turn = css({
   ...rowBorder,
   display: "flex",
   alignItems: "center",
@@ -137,9 +156,14 @@ export function InfraTrack(
                   </span>
                 )}
               </div>
+              <div className={cx(turn, last && lastRow)}>
+                {l.immediateBonus?.additionalTurns != null && (
+                  <AnotherTurn amount={l.immediateBonus.additionalTurns} />
+                )}
+              </div>
               <div className={cx(payoff, last && lastRow)}>
                 {l.commonBonus?.transportCapacityIncrease != null && (
-                  <TransportCapacity amount={l.commonBonus.transportCapacityIncrease} />
+                  <TransportCapacityIncrease amount={l.commonBonus.transportCapacityIncrease} />
                 )}
                 {l.commonBonus?.marketOverflowSlotPayoff != null && (
                   <OverflowSlot amount={l.commonBonus.marketOverflowSlotPayoff} />

@@ -1,12 +1,10 @@
-import { useState } from "react"
-import { laborMarket } from "~/board/labor"
 import { CARD_TRIM_H_MM, CARD_TRIM_W_MM } from "~/cards/cardSize"
 import { InfraTrack } from "~/components/InfraTrack"
-import { LaborMarket } from "~/components/LaborMarket"
+import { LaborSupply } from "~/components/LaborSupply"
 import { MarketStall } from "~/components/MarketStall"
 import { WorkerZone } from "~/components/WorkerZone"
-import { PLAYER_COUNTS, type PlayerCount } from "~/domain/CoreDefinitions"
 import { infrastructureTracks } from "~/domain/InfrastructureDefinitions"
+import { laborSupply } from "~/domain/LaborSupplyDefinitions"
 import { marketStalls } from "~/domain/MarketDefinitions"
 import { css } from "~/generated/styled-system/css"
 
@@ -41,7 +39,7 @@ import { css } from "~/generated/styled-system/css"
  * tracks: the outer grid's columns serve only the bottom band, and the top band
  * (`topBand`) is a nested full-width grid with its own columns.
  *
- *   outer columns (u): 5 1 34 1 5  (= 46u = 23in)  [infra gutter market gutter workers]
+ *   outer columns (u): 7 1 33 1 4  (= 46u = 23in)  [infra gutter market gutter workers]
  *   outer rows (u):    11 1 17 1 4  (= 34u = 17in)
  *                        (market spans the bottom three rows = 22u = 11in)
  *
@@ -56,7 +54,7 @@ import { css } from "~/generated/styled-system/css"
  *     top columns (u): 12 1 14 1 18  (= 46u = 23in)
  *     top areas:   "cardsL . harvest . cardsR"
  *
- *   - `infra`: bottom-left 2.5x11in (5u-wide) column spanning all three bottom
+ *   - `infra`: bottom-left 3.5x11in (7u-wide) column spanning all three bottom
  *     rows, holding the infrastructure upgrade tracks (Ports/Railways) stacked
  *     evenly with the Invest zone tucked below them, framed together. Separated
  *     from the market by a 1u (0.5in) gutter.
@@ -64,7 +62,7 @@ import { css } from "~/generated/styled-system/css"
  *     the 7 MarketStalls on an ellipse (kept upright for legibility) with the
  *     Sell zone at its centre. Ellipse is deliberately not yet re-fit to the
  *     narrower cell.
- *   - `workers`: bottom-right 2.5x11in (5u-wide) column spanning all three bottom
+ *   - `workers`: bottom-right 2x11in (4u-wide) column spanning all three bottom
  *     rows, holding the Labor Market with the Recruit zone tucked below it,
  *     framed together.
  *   - `cardsL`: 6in column — two Influence Card outlines over the Influence zone.
@@ -74,16 +72,17 @@ import { css } from "~/generated/styled-system/css"
  *   - The 1u buffer columns/gutter and the 1u buffer rows are real empty grid
  *     cells, so `gap` is 0.
  *
- * RADIUS_X/Y are sized against MarketStall's measured footprint at 4 players
- * (7 demand slots, its widest case: ~100x56mm) so the ring inscribes the
- * ~19x11in market cell with a few mm of clearance. With 7 stalls
- * anchored at the top vertex the ring's vertical extremes are asymmetric
- * (top sin=-1.0, bottom sin=+0.90), so OFFSET_Y nudges it down to visually
- * center the ellipse within the cell.
+ * RADIUS_X/Y were sized against MarketStall's former footprint (7 demand slots
+ * wide) so the ring inscribes the ~19x11in market cell with a few mm of
+ * clearance. The single-board stall is now 5 columns wide but up to two crates
+ * tall, so the footprint has shifted (narrower, taller) — the ring likely wants
+ * re-fitting. With 7 stalls anchored at the top vertex the ring's vertical
+ * extremes are asymmetric (top sin=-1.0, bottom sin=+0.90), so OFFSET_Y nudges
+ * it down to visually center the ellipse within the cell.
  */
 
 const RADIUS_X = 160
-const RADIUS_Y = 110
+const RADIUS_Y = 105
 const OFFSET_Y = 5
 const STALL_COUNT = 7
 
@@ -133,7 +132,7 @@ const sheetStyle = css({
   boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
   flex: "none",
   display: "grid",
-  gridTemplateColumns: "2.5in 0.5in 17in 0.5in 2.5in",
+  gridTemplateColumns: "3.5in 0.5in 16.5in 0.5in 2in",
   gridTemplateRows: "5.5in 0.5in 8.5in 0.5in 2in",
   gridTemplateAreas:
     `"topBand topBand topBand topBand topBand" ". . . . ." "infra . market . workers" "infra . market . workers" "infra . market . workers"`,
@@ -249,7 +248,6 @@ const stallWrap = css({
 })
 
 export function BoardPrintPage() {
-  const [players, setPlayers] = useState<PlayerCount>(4)
   const stalls = marketStalls.slice(0, STALL_COUNT)
 
   return (
@@ -258,19 +256,6 @@ export function BoardPrintPage() {
       <div className={`print-root ${screen}`}>
         <div className={`${note} screen-only`}>
           Print → 24x18in landscape · Margins: None · Scale: 100%
-          <label style={{ marginLeft: "12px" }}>
-            Players{" "}
-            <select
-              value={players}
-              onChange={(e) => setPlayers(Number(e.target.value) as PlayerCount)}
-            >
-              {PLAYER_COUNTS.map((n) => (
-                <option key={n} value={n}>
-                  {n}
-                </option>
-              ))}
-            </select>
-          </label>
         </div>
         <div className={`sheet ${sheetStyle}`}>
           <div className={topBandArea}>
@@ -299,7 +284,7 @@ export function BoardPrintPage() {
             </div>
           </div>
           <div className={workersArea}>
-            <LaborMarket tiers={laborMarket.workerTrack[players]} />
+            <LaborSupply track={laborSupply.workerTrack} />
             <div className={zoneCell}>
               <WorkerZone label="Recruit" />
             </div>
@@ -334,7 +319,7 @@ export function BoardPrintPage() {
                   <MarketStall
                     fruit={stall.fruit}
                     color="stone"
-                    slots={stall.demandTrack[players]}
+                    columns={stall.demandColumns}
                     induces={stall.induces}
                   />
                 </div>

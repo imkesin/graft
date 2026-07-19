@@ -1,39 +1,54 @@
 import { GoldCost } from "~/components/icons/GoldCost"
 import { InducedDemand } from "~/components/icons/InducedDemand"
-import { darkBand, paperFrame } from "~/components/paperFrame"
+import { darkBand, panelTint, paperFrame } from "~/components/paperFrame"
 import { FruitCrateSlot } from "~/components/slots/FruitCrateSlot"
 import { value } from "~/components/trackSlot"
-import { FRUIT_LIST_WITH_METADATA } from "~/domain/CoreDefinitions"
-import type { FruitColor, FruitName } from "~/domain/CoreDefinitions"
-import type { DemandSlot } from "~/domain/MarketDefinitions"
-import { css, cx } from "~/generated/styled-system/css"
-
 // A crate slot is tinted by its fruit's own colour, independent of the stall
 // frame's colour (which the board flattens to stone) — see FruitCrateSlot.
-const FRUIT_COLOR: Record<FruitName, FruitColor> = Object.fromEntries(
-  FRUIT_LIST_WITH_METADATA.map((f) => [f.name, f.color])
-) as Record<FruitName, FruitColor>
+import { FRUIT_COLOR, PLAYER_COUNTS } from "~/domain/CoreDefinitions"
+import type { FruitColor, FruitName } from "~/domain/CoreDefinitions"
+import type { DemandColumn } from "~/domain/MarketDefinitions"
+import { css, cx } from "~/generated/styled-system/css"
 
 /**
  * A fruit's market stall: header names the fruit, the demand track below is a
- * left-to-right line of slots that fills as the fruit sells — leftmost slots
- * pay the most gold, rightmost slots induce the most demand. Slot count grows
- * with player count; the track just subdivides into more, narrower slots
- * rather than growing physically (the physical footprint is decided once this
- * gets composed into the board's market ring). Which other fruits this one
- * induces demand for is listed as text below the track, rather than as
- * arrows on a shared board-wide diagram — see project discussion for why.
+ * left-to-right line of columns that fills as the fruit sells — leftmost
+ * columns pay the most gold, rightmost induce the most demand. Each column is
+ * one price/demand level: its `gold` and induced-demand icons print once,
+ * beneath a vertical stack of interchangeable crate slots.
+ *
+ * The board is printed once for every player count (see DemandColumn): a
+ * column's base crate sits at the bottom, and crates that only unlock at higher
+ * counts stack above it, badged "3+"/"4+" instead of stamped with the fruit
+ * initial. All crate stacks are bottom-aligned via a shared subgrid so base
+ * crates — and the gold/induced rows below them — line up across columns
+ * whatever each column's depth.
+ *
+ * Which other fruits this one induces demand for sits in a divided panel down
+ * the right side — a compact column of miniature fruit crates, then a gold coin,
+ * then a numberless induced-demand mark, echoing a demand column's crate/gold/
+ * demand order — rather than as arrows on a shared board-wide diagram (see
+ * project discussion for why). Keeping it beside the track rather than below
+ * keeps the stall wider than it is tall.
  */
 
+// Crates present at this count are the always-printed base and go unbadged.
+const BASE_PLAYERS = PLAYER_COUNTS[0]
+
+// Header spans the top; the demand track and the induces panel share the row
+// below it, split by the panel's left border (the vertical divider).
 const frame = css({
   display: "grid",
-  gridTemplateRows: "auto auto auto",
+  gridTemplateColumns: "1fr auto",
+  gridTemplateRows: "auto 1fr",
+  gridTemplateAreas: `"header header" "track induces"`,
   border: "0.3mm solid",
   borderRadius: "card",
   overflow: "hidden"
 })
 
 const header = css({
+  gridArea: "header",
   textAlign: "center",
   fontSize: "name",
   fontWeight: 700,
@@ -41,14 +56,16 @@ const header = css({
   paddingBlock: "2"
 })
 
-// Three shared row tracks (token / gold / induced-demand) that every slot
-// subgrids into, so a slot that omits a row (see `value` below) still lines
-// up with its neighbours instead of the remaining rows collapsing upward.
+// Shared row tracks that every column subgrids into (N crate rows + gold +
+// induced), so a column with a shallower stack or an omitted gold/induced row
+// (see `value` below) still lines up with its neighbours instead of collapsing
+// upward. `gridTemplateRows` is set inline since the crate-row count is data-
+// driven (the deepest column's stack).
 const track = css({
+  gridArea: "track",
   display: "grid",
   gridAutoFlow: "column",
-  gridAutoColumns: "1fr",
-  gridTemplateRows: "auto auto auto"
+  gridAutoColumns: "1fr"
 })
 
 const slot = css({
@@ -67,58 +84,70 @@ const slot = css({
 
 const lastSlot = css({ borderInlineEndWidth: 0 })
 
+// Right-side panel: a numberless induced-demand mark over a compact, centred
+// column of miniature crates. Its left border is the stall's vertical divider.
 const inducesSection = css({
+  gridArea: "induces",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: "1",
   paddingInline: "3",
   paddingBlock: "3",
-  borderTopWidth: "0.2mm",
-  borderTopStyle: "solid",
-  borderTopColor: "stone.400/40"
-})
-
-const inducesLabel = css({
-  fontSize: "micro",
-  fontWeight: 700,
-  textTransform: "uppercase",
-  letterSpacing: "0.04em",
-  opacity: 0.7
-})
-
-const inducesList = css({
-  fontSize: "body",
-  lineHeight: 1.3
+  borderInlineStartWidth: "0.2mm",
+  borderInlineStartStyle: "solid",
+  borderInlineStartColor: "stone.400/40"
 })
 
 export function MarketStall({
   fruit,
   color,
-  slots,
+  columns,
   induces
 }: {
   fruit: FruitName
   color: FruitColor
-  slots: readonly DemandSlot[]
+  columns: readonly DemandColumn[]
   induces: readonly FruitName[]
 }) {
+  const crateRows = columns.length > 0 ? Math.max(...columns.map((c) => c.slots.length)) : 0
   return (
     <div className={cx(frame, paperFrame({ color }))}>
       <div className={cx(header, darkBand({ color }))}>{fruit}</div>
-      <div className={track}>
-        {slots.map((s, i) => (
-          <div key={i} className={cx(slot, i === slots.length - 1 && lastSlot)}>
-            <FruitCrateSlot color={FRUIT_COLOR[fruit]} letter={fruit.charAt(0)} />
+      <div className={track} style={{ gridTemplateRows: `repeat(${crateRows}, auto) auto auto` }}>
+        {columns.map((c, i) => (
+          <div key={i} className={cx(slot, i === columns.length - 1 && lastSlot)}>
+            {Array.from({ length: crateRows }, (_, r) => {
+              // Bottom-align the stack: the base crate (slots[0]) sits in the
+              // lowest crate row, extras stack above; higher rows in shallower
+              // columns render an empty spacer to hold the shared alignment.
+              const threshold = c.slots[crateRows - 1 - r]
+              if (threshold === undefined) return <div key={r} />
+              return (
+                <FruitCrateSlot
+                  key={r}
+                  color={FRUIT_COLOR[fruit]}
+                  {...(threshold > BASE_PLAYERS
+                    ? { badge: `${threshold}+` }
+                    : { letter: fruit.charAt(0) })}
+                />
+              )
+            })}
             <span className={value}>
-              {s.gold > 0 && <GoldCost amount={s.gold} />}
+              {c.gold > 0 && <GoldCost amount={c.gold} />}
             </span>
             <span className={value}>
-              {s.inducedDemand > 0 && <InducedDemand amount={s.inducedDemand} />}
+              {c.inducedDemand > 0 && <InducedDemand amount={c.inducedDemand} />}
             </span>
           </div>
         ))}
       </div>
       {induces.length > 0 && (
-        <div className={inducesSection}>
-          <div className={inducesLabel}>Induces demand</div>
-          <div className={inducesList}>{induces.join(", ")}</div>
+        <div className={cx(inducesSection, panelTint({ color }))}>
+          {induces.map((f) => <FruitCrateSlot key={f} color={FRUIT_COLOR[f]} letter={f.charAt(0)} size={8} />)}
+          <GoldCost amount={1} size={8} />
+          <InducedDemand size={8} />
         </div>
       )}
     </div>

@@ -9,6 +9,11 @@ import { css } from "~/generated/styled-system/css"
  * initial): pale enough to sit under a placed token, but enough to identify the
  * slot — and it survives a black-and-white playtest print.
  *
+ * An optional `badge` (e.g. "3+") replaces that "W" with the player-count
+ * threshold, marking slots that only come into play at higher player counts so
+ * one board serves every count. It reuses the W's faint colour and centring —
+ * just a smaller font to fit the two glyphs — so it reads as the same stamp.
+ *
  * Drawn as inline SVG so it stays print-crisp and scales with `--u`.
  */
 
@@ -34,13 +39,13 @@ const OCTAGON = [
 
 const slot = css({ display: "block", width: "12", height: "12" })
 
-export function WorkerSlot({ className }: { className?: string }) {
+export function WorkerSlot({ className, badge }: { className?: string; badge?: string }) {
   return (
     <svg
       className={className ? `${slot} ${className}` : slot}
       viewBox="0 0 12 12"
       role="img"
-      aria-label="worker slot"
+      aria-label={badge ? `worker slot (${badge} players)` : "worker slot"}
     >
       <path d={OCTAGON} fill="var(--colors-brown-100)" stroke="var(--colors-stone-400)" strokeWidth={STROKE} />
       <text
@@ -48,11 +53,11 @@ export function WorkerSlot({ className }: { className?: string }) {
         y={6}
         textAnchor="middle"
         dominantBaseline="central"
-        fontSize={7.5}
+        fontSize={badge ? 5 : 7.5}
         fontWeight={700}
         fill="var(--colors-brown-200)"
       >
-        W
+        {badge ?? "W"}
       </text>
     </svg>
   )

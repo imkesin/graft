@@ -12,6 +12,11 @@ import { token } from "~/generated/styled-system/tokens"
  * out) — the intended playtest medium. Both stay pale enough that a physical
  * token placed in the slot still reads clearly on top.
  *
+ * An optional `badge` (e.g. "3+") replaces the letter with a player-count
+ * threshold — marking a stacked crate that only comes into play at higher
+ * counts, so one board serves every count. It reuses the faint ink, just a
+ * smaller font to fit the two glyphs.
+ *
  * Drawn as inline SVG so it stays print-crisp and scales with `--u`; the tint
  * and ink resolve at render time via `token()`, so any FruitColor works without
  * a per-colour style variant.
@@ -29,6 +34,7 @@ export function FruitCrateSlot(
   {
     color,
     letter,
+    badge,
     size,
     fill,
     ink,
@@ -36,6 +42,8 @@ export function FruitCrateSlot(
   }: {
     color?: FruitColor
     letter?: string
+    /** Replaces `letter` with a player-count threshold (e.g. "3+"), in a smaller font. */
+    badge?: string
     size?: number
     /** Override the crate fill (any CSS colour); defaults to the fruit tint / white. */
     fill?: string
@@ -44,6 +52,7 @@ export function FruitCrateSlot(
     className?: string
   }
 ) {
+  const stamp = badge ?? letter
   const fillColor = fill ?? (color ? token(`colors.${color}.100`) : "white")
   const inkColor = ink ?? (color ? token(`colors.${color}.200`) : token("colors.stone.200"))
   // `size` (in card units) overrides the default 12u square via inline style,
@@ -55,7 +64,7 @@ export function FruitCrateSlot(
       style={sizeStyle}
       viewBox="0 0 12 12"
       role="img"
-      aria-label={letter ? `${letter} crate slot` : "crate slot"}
+      aria-label={badge ? `crate slot (${badge} players)` : letter ? `${letter} crate slot` : "crate slot"}
     >
       <rect
         x={INSET}
@@ -68,17 +77,17 @@ export function FruitCrateSlot(
         stroke="var(--colors-stone-400)"
         strokeWidth={STROKE}
       />
-      {letter && (
+      {stamp && (
         <text
           x={6}
           y={6}
           textAnchor="middle"
           dominantBaseline="central"
-          fontSize={FONT}
+          fontSize={badge ? 5 : FONT}
           fontWeight={700}
           fill={inkColor}
         >
-          {letter}
+          {stamp}
         </text>
       )}
     </svg>

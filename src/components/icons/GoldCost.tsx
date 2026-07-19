@@ -9,7 +9,9 @@ import { css } from "~/generated/styled-system/css"
  * Drawn as an inline SVG (like WorkerZone) so it stays crisp at print and
  * scales with `--u`: the outer size uses the card-unit `10` token, and every
  * interior coordinate lives in the matching 0..10 viewBox, so the number scales
- * with the coin rather than needing its own font token.
+ * with the coin rather than needing its own font token. `size` (card units)
+ * shrinks the whole coin — number included — for compact uses like MarketStall's
+ * induces panel.
  */
 
 // Geometry in the 0..10 viewBox (1 unit = 1mm at print).
@@ -22,10 +24,14 @@ const FONT = 3.6 // fits two tabular digits within the 7.8 face
 
 const coin = css({ display: "block", width: "10", height: "10" })
 
-export function GoldCost({ amount, className }: { amount: number; className?: string }) {
+export function GoldCost({ amount, size, className }: { amount: number; size?: number; className?: string }) {
+  // `size` (in card units) overrides the default 10u box via inline style,
+  // which reliably wins over the `coin` class regardless of stylesheet order.
+  const sizeStyle = size ? { width: `calc(${size} * var(--u))`, height: `calc(${size} * var(--u))` } : undefined
   return (
     <svg
       className={className ? `${coin} ${className}` : coin}
+      style={sizeStyle}
       viewBox="0 0 10 10"
       role="img"
       aria-label={`${amount} gold`}

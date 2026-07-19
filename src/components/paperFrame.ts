@@ -5,7 +5,7 @@ import { cva } from "~/generated/styled-system/css"
  * `{color}.50` paper / `{color}.900` ink / `{color}.500` border for the
  * surface, background/ink inverted for the band. Shared by every card-like
  * surface that follows this recipe — Card's field/field-improvement/
- * influence/election kinds, MarketStall's fruit colors, and LaborMarket's
+ * influence/election kinds, MarketStall's fruit colors, and LaborSupply's
  * brown. Card.tsx's frame has no visible border, so the borderColor is simply
  * unused there. Card.tsx's influence/election kinds still layer their own
  * band override on top (see Card.tsx) since those two don't follow the
@@ -27,6 +27,31 @@ export const paperFrame = cva({
       zinc: { background: "zinc.50", color: "zinc.900", borderColor: "zinc.500" },
       cyan: { background: "cyan.50", color: "cyan.900", borderColor: "cyan.500" },
       neutral: { background: "neutral.50", color: "neutral.900", borderColor: "neutral.500" }
+    }
+  }
+})
+
+/**
+ * One notch darker than the paper surface (`{color}.100` vs `.50`), on the same
+ * scale. For structural subregions that should read as chrome rather than
+ * content — e.g. MarketStall's induces panel.
+ */
+export const panelTint = cva({
+  variants: {
+    color: {
+      red: { background: "red.200" },
+      orange: { background: "orange.200" },
+      yellow: { background: "yellow.200" },
+      amber: { background: "amber.200" },
+      lime: { background: "lime.200" },
+      green: { background: "green.200" },
+      violet: { background: "violet.200" },
+      pink: { background: "pink.200" },
+      stone: { background: "stone.200" },
+      brown: { background: "brown.200" },
+      zinc: { background: "zinc.200" },
+      cyan: { background: "cyan.200" },
+      neutral: { background: "neutral.200" }
     }
   }
 })

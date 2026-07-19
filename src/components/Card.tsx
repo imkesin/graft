@@ -5,8 +5,8 @@ import { GoldCost } from "~/components/icons/GoldCost"
 import { WorkerCost } from "~/components/icons/WorkerCost"
 import { paperFrame } from "~/components/paperFrame"
 import { FruitCrateSlot } from "~/components/slots/FruitCrateSlot"
-import { FRUIT_LIST_WITH_METADATA } from "~/domain/CoreDefinitions"
-import type { FruitColor, FruitName, PlayerCount } from "~/domain/CoreDefinitions"
+import { FRUIT_COLOR } from "~/domain/CoreDefinitions"
+import type { PlayerCount } from "~/domain/CoreDefinitions"
 import { css, cva, cx } from "~/generated/styled-system/css"
 import { Guides } from "./Guides"
 
@@ -16,10 +16,6 @@ import { Guides } from "./Guides"
  * than the body rather than the dark-band inversion the other two kinds use.
  */
 type CardKind = CardBase["kind"]
-
-const FRUIT_COLOR: Record<FruitName, FruitColor> = Object.fromEntries(
-  FRUIT_LIST_WITH_METADATA.map((f) => [f.name, f.color])
-) as Record<FruitName, FruitColor>
 
 // The card's base surface, by kind — the shared `paperFrame` recipe (see
 // ~/components/paperFrame) covers all four kinds with no deviation.

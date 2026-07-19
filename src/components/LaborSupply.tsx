@@ -1,8 +1,13 @@
 import { GoldCost } from "~/components/icons/GoldCost"
 import { darkBand, paperFrame } from "~/components/paperFrame"
 import { WorkerSlot } from "~/components/slots/WorkerSlot"
-import type { LaborTier } from "~/domain/MarketDefinitions"
+import { PLAYER_COUNTS } from "~/domain/CoreDefinitions"
+import type { LaborSupplyTier } from "~/domain/LaborSupplyDefinitions"
 import { css, cx } from "~/generated/styled-system/css"
+
+// Slots at this player count are the always-printed base and go unbadged; a
+// slot unlocking above it prints a "3+"/"4+" badge.
+const BASE_PLAYERS = PLAYER_COUNTS[0]
 
 /**
  * The Labor Market: workers up for hire, grouped into cost tiers (cheapest at
@@ -69,16 +74,18 @@ const staggered = css({
   }
 })
 
-export function LaborMarket({ tiers }: { tiers: readonly LaborTier[] }) {
+export function LaborSupply({ track: tiers }: { track: readonly LaborSupplyTier[] }) {
   return (
     <div className={cx(frame, paperFrame({ color: "stone" }))}>
-      <div className={cx(header, darkBand({ color: "stone" }))}>Labor Market</div>
+      <div className={cx(header, darkBand({ color: "stone" }))}>Labor Supply</div>
       <div className={track}>
         {tiers.map((t, i) => (
           <div key={i} className={cx(tier, i === tiers.length - 1 && lastTier)}>
             <GoldCost amount={t.gold} />
-            <div className={cx(tokens, t.count % 2 === 1 && staggered)}>
-              {Array.from({ length: t.count }, (_, j) => <WorkerSlot key={j} />)}
+            <div className={cx(tokens, t.slots.length % 2 === 1 && staggered)}>
+              {t.slots.map((minPlayers, j) => (
+                <WorkerSlot key={j} badge={minPlayers > BASE_PLAYERS ? `${minPlayers}+` : undefined} />
+              ))}
             </div>
           </div>
         ))}

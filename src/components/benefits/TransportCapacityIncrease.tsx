@@ -45,7 +45,7 @@ const FONT = 2.8
 // payoffs read at the same size; the 0..12 viewBox scales up uniformly.
 const badge = css({ display: "block", width: "15", height: "15" })
 
-export function TransportCapacity({ amount, className }: { amount: number; className?: string }) {
+export function TransportCapacityIncrease({ amount, className }: { amount: number; className?: string }) {
   return (
     <svg
       className={className ? `${badge} ${className}` : badge}
