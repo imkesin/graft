@@ -7,6 +7,7 @@ type InfrastructureUpgradeCost = {
   readonly gold: number
   readonly workers: number
   readonly fieldsToDiscardCount?: number
+  readonly workersToRemove?: number
 }
 
 type InfrastructureImmediateBonus = {
@@ -15,7 +16,7 @@ type InfrastructureImmediateBonus = {
 
 type InfrastructureCommonBonus = {
   readonly transportCapacityIncrease?: number
-  readonly marketOverflowSlotIncrease?: number
+  readonly marketOverflowSlotPayoff?: number
 }
 
 export type InfrastructureTrackLevel = {
@@ -36,9 +37,9 @@ export const infrastructureTracks: readonly InfraTrackDefinition[] = [
       {
         cost: {
           gold: 4,
-          workers: 3,
-          fieldsToDiscardCount: 1
-        }
+          workers: 3
+        },
+        commonBonus: { transportCapacityIncrease: 1 }
       },
       {
         cost: {
@@ -52,11 +53,11 @@ export const infrastructureTracks: readonly InfraTrackDefinition[] = [
       {
         cost: {
           gold: 10,
-          workers: 4,
-          fieldsToDiscardCount: 2
+          workers: 3,
+          fieldsToDiscardCount: 1
         },
         immediateBonus: { additionalTurns: 1 },
-        commonBonus: { transportCapacityIncrease: 1 }
+        commonBonus: { transportCapacityIncrease: 2 }
       },
       {
         cost: {
@@ -65,7 +66,7 @@ export const infrastructureTracks: readonly InfraTrackDefinition[] = [
           fieldsToDiscardCount: 2
         },
         immediateBonus: { additionalTurns: 2 },
-        commonBonus: { transportCapacityIncrease: 1 }
+        commonBonus: { transportCapacityIncrease: 2 }
       },
       {
         cost: {
@@ -74,7 +75,7 @@ export const infrastructureTracks: readonly InfraTrackDefinition[] = [
           fieldsToDiscardCount: 3
         },
         immediateBonus: { additionalTurns: 3 },
-        commonBonus: { transportCapacityIncrease: 1 }
+        commonBonus: { transportCapacityIncrease: 3 }
       }
     ]
   },
@@ -85,7 +86,8 @@ export const infrastructureTracks: readonly InfraTrackDefinition[] = [
         cost: {
           gold: 8,
           workers: 2
-        }
+        },
+        commonBonus: { marketOverflowSlotPayoff: 1 }
       },
       {
         cost: {
@@ -93,31 +95,34 @@ export const infrastructureTracks: readonly InfraTrackDefinition[] = [
           workers: 2
         },
         immediateBonus: { additionalTurns: 1 },
-        commonBonus: { marketOverflowSlotIncrease: 1 }
+        commonBonus: { marketOverflowSlotPayoff: 2 }
       },
       {
         cost: {
           gold: 16,
-          workers: 3
+          workers: 2,
+          workersToRemove: 1
         },
         immediateBonus: { additionalTurns: 1 },
-        commonBonus: { marketOverflowSlotIncrease: 1 }
+        commonBonus: { marketOverflowSlotPayoff: 2 }
       },
       {
         cost: {
           gold: 20,
-          workers: 3
+          workers: 3,
+          workersToRemove: 1
         },
         immediateBonus: { additionalTurns: 2 },
-        commonBonus: { marketOverflowSlotIncrease: 1 }
+        commonBonus: { marketOverflowSlotPayoff: 3 }
       },
       {
         cost: {
           gold: 24,
-          workers: 4
+          workers: 4,
+          workersToRemove: 1
         },
         immediateBonus: { additionalTurns: 3 },
-        commonBonus: { marketOverflowSlotIncrease: 1 }
+        commonBonus: { marketOverflowSlotPayoff: 5 }
       }
     ]
   }

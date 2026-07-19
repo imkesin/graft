@@ -448,9 +448,10 @@ function fieldRegions(card: FieldCardBase): BodyRegions {
             </span>
             <span className={cx(fieldOutputCell, i > 0 && fieldRowDivider)}>
               <span className={fieldCrateRow}>
-                {Array.from({ length: row.amount }, (_, j) => (
-                  <FruitCrateSlot key={j} color={FRUIT_COLOR[card.fruit]} letter={card.fruit.charAt(0)} />
-                ))}
+                {Array.from(
+                  { length: row.amount },
+                  (_, j) => <FruitCrateSlot key={j} color={FRUIT_COLOR[card.fruit]} letter={card.fruit.charAt(0)} />
+                )}
               </span>
               {`${row.amount} ${card.fruit}`}
             </span>

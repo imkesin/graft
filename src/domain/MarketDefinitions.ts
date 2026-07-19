@@ -1,9 +1,4 @@
-import {
-  FRUIT_LIST_WITH_METADATA,
-  type FruitColor,
-  type FruitName,
-  type PlayerCount
-} from "~/domain/CoreDefinitions"
+import { FRUIT_LIST_WITH_METADATA, type FruitColor, type FruitName, type PlayerCount } from "~/domain/CoreDefinitions"
 
 /**
  * One slot on a fruit's demand track: what a sale there pays in gold, and the

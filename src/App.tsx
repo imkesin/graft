@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react"
 import { fieldDeck, previewCard } from "~/cards/fieldDeck"
 import { influenceDeck } from "~/cards/influenceDeck"
+import { OverflowSlot } from "~/components/benefits/OverflowSlot"
 import { Card } from "~/components/Card"
+import { FieldDiscard } from "~/components/icons/FieldDiscard"
 import { GoldCost } from "~/components/icons/GoldCost"
 import { InducedDemand } from "~/components/icons/InducedDemand"
+import { TransportCapacity } from "~/components/icons/TransportCapacity"
 import { WorkerCost } from "~/components/icons/WorkerCost"
+import { MarketStall } from "~/components/MarketStall"
 import { FruitCrateSlot } from "~/components/slots/FruitCrateSlot"
 import { WorkerSlot } from "~/components/slots/WorkerSlot"
-import { MarketStall } from "~/components/MarketStall"
 import { ZoomControl } from "~/components/ZoomControl"
 import { FRUIT_LIST_WITH_METADATA, type FruitName, PLAYER_COUNTS, type PlayerCount } from "~/domain/CoreDefinitions"
 import { marketStalls } from "~/domain/MarketDefinitions"
@@ -115,10 +118,22 @@ export function App() {
         <InducedDemand amount={1} />
         <InducedDemand amount={2} />
       </div>
+      <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+        <FieldDiscard amount={1} />
+        <FieldDiscard amount={2} />
+        <FieldDiscard amount={3} />
+      </div>
+      <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+        <OverflowSlot amount={2} />
+        <OverflowSlot amount={5} />
+      </div>
+      <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+        <TransportCapacity amount={1} />
+        <TransportCapacity amount={2} />
+        <TransportCapacity amount={3} />
+      </div>
       <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-        {FRUIT_LIST_WITH_METADATA.map((f) => (
-          <FruitCrateSlot key={f.name} color={f.color} letter={f.name.charAt(0)} />
-        ))}
+        {FRUIT_LIST_WITH_METADATA.map((f) => <FruitCrateSlot key={f.name} color={f.color} letter={f.name.charAt(0)} />)}
       </div>
       <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
         <WorkerSlot />

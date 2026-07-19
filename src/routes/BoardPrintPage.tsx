@@ -1,6 +1,5 @@
 import { useState } from "react"
 import { laborMarket } from "~/board/labor"
-import { marketStalls } from "~/domain/MarketDefinitions"
 import { CARD_TRIM_H_MM, CARD_TRIM_W_MM } from "~/cards/cardSize"
 import { InfraTrack } from "~/components/InfraTrack"
 import { LaborMarket } from "~/components/LaborMarket"
@@ -8,6 +7,7 @@ import { MarketStall } from "~/components/MarketStall"
 import { WorkerZone } from "~/components/WorkerZone"
 import { PLAYER_COUNTS, type PlayerCount } from "~/domain/CoreDefinitions"
 import { infrastructureTracks } from "~/domain/InfrastructureDefinitions"
+import { marketStalls } from "~/domain/MarketDefinitions"
 import { css } from "~/generated/styled-system/css"
 
 /**

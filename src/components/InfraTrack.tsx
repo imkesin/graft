@@ -1,5 +1,10 @@
+import { Fragment } from "react"
+import { OverflowSlot } from "~/components/benefits/OverflowSlot"
+import { FieldDiscard } from "~/components/icons/FieldDiscard"
 import { GoldCost } from "~/components/icons/GoldCost"
+import { TransportCapacity } from "~/components/icons/TransportCapacity"
 import { WorkerCost } from "~/components/icons/WorkerCost"
+import { WorkerRemove } from "~/components/icons/WorkerRemove"
 import { darkBand, paperFrame } from "~/components/paperFrame"
 import type { Infrastructure, InfrastructureTrackLevel } from "~/domain/InfrastructureDefinitions"
 import { css, cx } from "~/generated/styled-system/css"
@@ -40,68 +45,63 @@ const header = css({
   paddingBlock: "1"
 })
 
+// One 2-column grid for the whole ladder: cost (auto, as narrow as its badges)
+// on the left, payoff (1fr) on the right. Running the levels through a single
+// grid — rather than one grid per row — lets the payoff cells' shared left
+// border stack into a continuous vertical divider between the two zones.
 const track = css({
   display: "grid",
-  gridAutoFlow: "row",
+  gridTemplateColumns: "auto 1fr",
   gridAutoRows: "1fr",
   minHeight: 0
 })
 
-// Level marker | cost stack | effect text. The cost column is `auto` so it
-// stays as narrow as its badges, leaving the rest for the effect.
-const level = css({
-  display: "grid",
-  gridTemplateColumns: "auto auto 1fr",
-  alignItems: "center",
-  gap: "1.5",
-  paddingInline: "2",
-  paddingBlock: "1",
+const rowBorder = {
   borderBottomWidth: "0.2mm",
   borderBottomStyle: "solid",
   borderBottomColor: "stone.400/40"
+} as const
+
+// Cost column: the badge boxes sit side by side (gold, workers, discard).
+const cost = css({
+  ...rowBorder,
+  display: "flex",
+  alignItems: "center",
+  gap: "1",
+  paddingInline: "2",
+  paddingBlock: "1"
 })
 
-const lastLevel = css({ borderBottomWidth: 0 })
-
-const levelMark = css({
+// Each cost badge rides in a faint 12x12 box so the three read as a matched set.
+const badgeBox = css({
   display: "inline-flex",
   alignItems: "center",
   justifyContent: "center",
-  width: "6",
-  height: "6",
-  borderWidth: "0.3mm",
+  width: "12",
+  height: "12",
+  borderWidth: "0.2mm",
   borderStyle: "solid",
-  borderColor: "stone.400",
-  borderRadius: "9999px",
-  fontSize: "micro",
-  fontWeight: 700,
-  fontVariantNumeric: "tabular-nums",
+  borderColor: "stone.400/40",
+  background: "stone.400/10",
+  borderRadius: "calc(1 * var(--u))",
   flexShrink: 0
 })
 
-// Worker and gold sit side by side (left to right) in the cost column.
-const cost = css({
+// Payoff column: its left border is the continuous divider between cost and
+// payoff (the stacked cells share one vertical line).
+const payoff = css({
+  ...rowBorder,
   display: "flex",
   alignItems: "center",
-  gap: "0.5"
+  justifyContent: "center",
+  paddingInline: "2",
+  paddingBlock: "1",
+  borderLeftWidth: "0.3mm",
+  borderLeftStyle: "solid",
+  borderLeftColor: "stone.400"
 })
 
-const effect = css({
-  fontSize: "micro",
-  lineHeight: 1.2
-})
-
-// The schema carries effects as structured bonuses, not free text; render the
-// ones a level grants as a short human-readable line (blank on the free rung).
-function effectText(level: InfrastructureTrackLevel): string {
-  const parts: string[] = []
-  const transportCapacityIncrease = level.commonBonus?.transportCapacityIncrease
-  const marketOverflowSlotIncrease = level.commonBonus?.marketOverflowSlotIncrease
-  if (transportCapacityIncrease) parts.push(`+${transportCapacityIncrease} Transport Capacity`)
-  if (marketOverflowSlotIncrease) parts.push(`+${marketOverflowSlotIncrease} Overflow Slot`)
-  if (level.immediateBonus?.additionalTurns) parts.push(`+${level.immediateBonus.additionalTurns} Turn`)
-  return parts.join(" · ")
-}
+const lastRow = css({ borderBottomWidth: 0 })
 
 export function InfraTrack(
   { kind, levels }: { kind: Infrastructure; levels: readonly InfrastructureTrackLevel[] }
@@ -111,16 +111,43 @@ export function InfraTrack(
     <div className={cx(frame, paperFrame({ color }))}>
       <div className={cx(header, darkBand({ color }))}>{kind}</div>
       <div className={track}>
-        {levels.map((l, i) => (
-          <div key={i} className={cx(level, i === levels.length - 1 && lastLevel)}>
-            <span className={levelMark}>{i + 1}</span>
-            <div className={cost}>
-              {l.cost.gold > 0 && <GoldCost amount={l.cost.gold} />}
-              {l.cost.workers > 0 && <WorkerCost amount={l.cost.workers} />}
-            </div>
-            <span className={effect}>{effectText(l)}</span>
-          </div>
-        ))}
+        {levels.map((l, i) => {
+          const last = i === levels.length - 1
+          return (
+            <Fragment key={i}>
+              <div className={cx(cost, last && lastRow)}>
+                {l.cost.gold > 0 && (
+                  <span className={badgeBox}>
+                    <GoldCost amount={l.cost.gold} />
+                  </span>
+                )}
+                {l.cost.workers > 0 && (
+                  <span className={badgeBox}>
+                    <WorkerCost amount={l.cost.workers} />
+                  </span>
+                )}
+                {l.cost.workersToRemove != null && l.cost.workersToRemove > 0 && (
+                  <span className={badgeBox}>
+                    <WorkerRemove amount={l.cost.workersToRemove} />
+                  </span>
+                )}
+                {l.cost.fieldsToDiscardCount != null && l.cost.fieldsToDiscardCount > 0 && (
+                  <span className={badgeBox}>
+                    <FieldDiscard amount={l.cost.fieldsToDiscardCount} />
+                  </span>
+                )}
+              </div>
+              <div className={cx(payoff, last && lastRow)}>
+                {l.commonBonus?.transportCapacityIncrease != null && (
+                  <TransportCapacity amount={l.commonBonus.transportCapacityIncrease} />
+                )}
+                {l.commonBonus?.marketOverflowSlotPayoff != null && (
+                  <OverflowSlot amount={l.commonBonus.marketOverflowSlotPayoff} />
+                )}
+              </div>
+            </Fragment>
+          )
+        })}
       </div>
     </div>
   )

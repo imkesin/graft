@@ -30,11 +30,22 @@ export function FruitCrateSlot(
     color,
     letter,
     size,
+    fill,
+    ink,
     className
-  }: { color?: FruitColor; letter?: string; size?: number; className?: string }
+  }: {
+    color?: FruitColor
+    letter?: string
+    size?: number
+    /** Override the crate fill (any CSS colour); defaults to the fruit tint / white. */
+    fill?: string
+    /** Override the stamped-letter colour; defaults to the fruit tint / faint stone. */
+    ink?: string
+    className?: string
+  }
 ) {
-  const fill = color ? token(`colors.${color}.100`) : "white"
-  const ink = color ? token(`colors.${color}.200`) : token("colors.stone.200")
+  const fillColor = fill ?? (color ? token(`colors.${color}.100`) : "white")
+  const inkColor = ink ?? (color ? token(`colors.${color}.200`) : token("colors.stone.200"))
   // `size` (in card units) overrides the default 12u square via inline style,
   // which reliably wins over the `slot` class regardless of stylesheet order.
   const sizeStyle = size ? { width: `calc(${size} * var(--u))`, height: `calc(${size} * var(--u))` } : undefined
@@ -53,7 +64,7 @@ export function FruitCrateSlot(
         height={12 - STROKE}
         rx={RADIUS}
         ry={RADIUS}
-        fill={fill}
+        fill={fillColor}
         stroke="var(--colors-stone-400)"
         strokeWidth={STROKE}
       />
@@ -65,7 +76,7 @@ export function FruitCrateSlot(
           dominantBaseline="central"
           fontSize={FONT}
           fontWeight={700}
-          fill={ink}
+          fill={inkColor}
         >
           {letter}
         </text>
