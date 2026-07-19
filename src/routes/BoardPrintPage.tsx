@@ -95,7 +95,15 @@ const printCss = `
   @media print {
     html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; }
     .screen-only { display: none !important; }
-    .print-root { background: #fff !important; padding: 0 !important; display: block !important; }
+    /*
+     * height + overflow:hidden pins the print root to exactly one 18in page.
+     * The market stalls are centred with transform: translate(-50%, -50%), and
+     * Chrome paginates from the PRE-transform box, whose downward extent crosses
+     * the page edge — fragmenting the bottom stalls (Coconut/Lime) onto a
+     * phantom second page. Clipping to one page suppresses that break; nothing
+     * visible is lost since all content fits within the 18in sheet.
+     */
+    .print-root { background: #fff !important; padding: 0 !important; display: block !important; height: 18in !important; overflow: hidden !important; }
     .sheet { box-shadow: none !important; margin: 0 !important; }
   }
 `
@@ -238,7 +246,7 @@ const gameArea = css({
   gridArea: "market",
   position: "relative",
   border: "0.3mm dotted",
-  borderColor: "stone.400",
+  borderColor: "stone.200",
   borderRadius: "card"
 })
 
