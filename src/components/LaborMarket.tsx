@@ -1,6 +1,6 @@
-import { Coins } from "lucide-react"
+import { GoldCost } from "~/components/icons/GoldCost"
 import { darkBand, paperFrame } from "~/components/paperFrame"
-import { icon, tokenSlot, value } from "~/components/trackSlot"
+import { WorkerSlot } from "~/components/slots/WorkerSlot"
 import type { LaborTier } from "~/domain/MarketDefinitions"
 import { css, cx } from "~/generated/styled-system/css"
 
@@ -57,25 +57,28 @@ const tokens = css({
   gridTemplateColumns: "repeat(2, auto)",
   justifyContent: "flex-end",
   alignContent: "center",
-  gap: "2"
+  gap: "1"
+})
+
+// With an odd worker count the right column has one fewer slot; dropping it by
+// half the vertical pitch (half of the 12u slot + 1u row gap = 6.5u) nestles
+// those slots between the left column's instead of leaving a lone gap.
+const staggered = css({
+  "& > :nth-child(even)": {
+    transform: "translateY(calc(6.5 * var(--u)))"
+  }
 })
 
 export function LaborMarket({ tiers }: { tiers: readonly LaborTier[] }) {
   return (
-    <div className={cx(frame, paperFrame({ color: "brown" }))}>
-      <div className={cx(header, darkBand({ color: "brown" }))}>Labor Market</div>
+    <div className={cx(frame, paperFrame({ color: "stone" }))}>
+      <div className={cx(header, darkBand({ color: "stone" }))}>Labor Market</div>
       <div className={track}>
         {tiers.map((t, i) => (
           <div key={i} className={cx(tier, i === tiers.length - 1 && lastTier)}>
-            <span className={value}>
-              <Coins className={icon} />
-              {t.gold}
-            </span>
-            <div className={tokens}>
-              {Array.from(
-                { length: t.count },
-                (_, j) => <span key={j} className={tokenSlot({ size: "lg", shape: "circle" })} />
-              )}
+            <GoldCost amount={t.gold} />
+            <div className={cx(tokens, t.count % 2 === 1 && staggered)}>
+              {Array.from({ length: t.count }, (_, j) => <WorkerSlot key={j} />)}
             </div>
           </div>
         ))}

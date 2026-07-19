@@ -31,49 +31,6 @@ export type InfraTrackDefinition = {
 
 export const infrastructureTracks: readonly InfraTrackDefinition[] = [
   {
-    kind: "Ports",
-    levels: [
-      {
-        cost: {
-          gold: 8,
-          workers: 2
-        }
-      },
-      {
-        cost: {
-          gold: 12,
-          workers: 2
-        },
-        immediateBonus: { additionalTurns: 1 },
-        commonBonus: { marketOverflowSlotIncrease: 1 }
-      },
-      {
-        cost: {
-          gold: 16,
-          workers: 3
-        },
-        immediateBonus: { additionalTurns: 1 },
-        commonBonus: { marketOverflowSlotIncrease: 1 }
-      },
-      {
-        cost: {
-          gold: 20,
-          workers: 3
-        },
-        immediateBonus: { additionalTurns: 2 },
-        commonBonus: { marketOverflowSlotIncrease: 1 }
-      },
-      {
-        cost: {
-          gold: 24,
-          workers: 4
-        },
-        immediateBonus: { additionalTurns: 3 },
-        commonBonus: { marketOverflowSlotIncrease: 1 }
-      }
-    ]
-  },
-  {
     kind: "Railways",
     levels: [
       {
@@ -118,6 +75,49 @@ export const infrastructureTracks: readonly InfraTrackDefinition[] = [
         },
         immediateBonus: { additionalTurns: 3 },
         commonBonus: { transportCapacityIncrease: 1 }
+      }
+    ]
+  },
+  {
+    kind: "Ports",
+    levels: [
+      {
+        cost: {
+          gold: 8,
+          workers: 2
+        }
+      },
+      {
+        cost: {
+          gold: 12,
+          workers: 2
+        },
+        immediateBonus: { additionalTurns: 1 },
+        commonBonus: { marketOverflowSlotIncrease: 1 }
+      },
+      {
+        cost: {
+          gold: 16,
+          workers: 3
+        },
+        immediateBonus: { additionalTurns: 1 },
+        commonBonus: { marketOverflowSlotIncrease: 1 }
+      },
+      {
+        cost: {
+          gold: 20,
+          workers: 3
+        },
+        immediateBonus: { additionalTurns: 2 },
+        commonBonus: { marketOverflowSlotIncrease: 1 }
+      },
+      {
+        cost: {
+          gold: 24,
+          workers: 4
+        },
+        immediateBonus: { additionalTurns: 3 },
+        commonBonus: { marketOverflowSlotIncrease: 1 }
       }
     ]
   }

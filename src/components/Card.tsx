@@ -1,41 +1,34 @@
-import { Coins, PersonStanding } from "lucide-react"
+import { ZodiacVirgo } from "lucide-react"
 import { Fragment, type ReactNode } from "react"
 import type { Card, CardBase, Cost, FieldCardBase, FieldImprovementCardBase, InfluenceCardBase } from "~/cards/domain"
+import { GoldCost } from "~/components/icons/GoldCost"
+import { WorkerCost } from "~/components/icons/WorkerCost"
 import { paperFrame } from "~/components/paperFrame"
+import { FruitCrateSlot } from "~/components/slots/FruitCrateSlot"
 import { FRUIT_LIST_WITH_METADATA } from "~/domain/CoreDefinitions"
 import type { FruitColor, FruitName, PlayerCount } from "~/domain/CoreDefinitions"
 import { css, cva, cx } from "~/generated/styled-system/css"
-import { token } from "~/generated/styled-system/tokens"
 import { Guides } from "./Guides"
 
 /**
- * Field cards read as brown (fields, crops); field-improvements as stone;
+ * Field cards read as green (fields, crops); field-improvements as stone;
  * influences as zinc — near-white, with the header/footer bands brighter
  * than the body rather than the dark-band inversion the other two kinds use.
  */
 type CardKind = CardBase["kind"]
 
-// The card's base surface, by kind — the shared `paperFrame` recipe (see
-// ~/components/paperFrame) covers all four kinds with no deviation.
-const KIND_PAPER_COLOR = {
-  field: "brown",
-  "field-improvement": "stone",
-  influence: "zinc",
-  election: "cyan"
-} as const satisfies Record<CardKind, string>
-
 const FRUIT_COLOR: Record<FruitName, FruitColor> = Object.fromEntries(
   FRUIT_LIST_WITH_METADATA.map((f) => [f.name, f.color])
 ) as Record<FruitName, FruitColor>
 
-// Field header/footer bands are a flat `brown.900` via `darkBand` below, but
-// each field additionally gradates left-to-right from its fruit's color into
-// that brown so fields read at a glance. The fruit varies per card, so this
-// can't be a static Panda token — it's resolved at render time with `token()`
-// and applied as an inline `background`, overriding `darkBand`'s flat one.
-function fieldBandBackground(fruit: FruitName): string {
-  return `linear-gradient(to right, ${token(`colors.${FRUIT_COLOR[fruit]}.900`)}, ${token("colors.brown.900")})`
-}
+// The card's base surface, by kind — the shared `paperFrame` recipe (see
+// ~/components/paperFrame) covers all four kinds with no deviation.
+const KIND_PAPER_COLOR = {
+  field: "green",
+  "field-improvement": "stone",
+  influence: "zinc",
+  election: "cyan"
+} as const satisfies Record<CardKind, string>
 
 /** Field-improvement uses a rules-text body layout (a cost rail over a
  * freeform text band). Influence has its own thirds layout (`InfluenceBody`). */
@@ -86,7 +79,7 @@ const frame = css({
 const darkBand = cva({
   variants: {
     kind: {
-      field: { background: "brown.900", color: "brown.50" },
+      field: { background: "green.900", color: "green.50" },
       "field-improvement": { background: "stone.900", color: "stone.50" },
       influence: { background: "white", color: "zinc.900" },
       election: { background: "cyan.600", color: "cyan.50" },
@@ -101,7 +94,7 @@ const darkBand = cva({
 const paperBorder = cva({
   variants: {
     kind: {
-      field: { borderColor: "brown.50" },
+      field: { borderColor: "green.50" },
       "field-improvement": { borderColor: "stone.50" },
       influence: { borderColor: "zinc.900" },
       election: { borderColor: "cyan.50" },
@@ -128,7 +121,7 @@ const accentOutline = cva({
   base: { outlineWidth: "0.2mm", outlineStyle: "solid" },
   variants: {
     kind: {
-      field: { outlineColor: "brown.500" },
+      field: { outlineColor: "green.500" },
       "field-improvement": { outlineColor: "stone.500" },
       influence: { outlineColor: "zinc.500" },
       election: { outlineColor: "cyan.500" },
@@ -174,7 +167,7 @@ const titleText = css({
 // every piece is placed rather than margin-shifted. Columns: a left gutter
 // (card edge -> safe line), the 1fr content column, and an `auto` cost column
 // that runs out to the card's right edge. Rows: fields keep the lead/cost band
-// over the worker table (2fr/3fr); text-body cards (field-improvement,
+// over the harvest table (2fr/3fr); text-body cards (field-improvement,
 // improvement) split evenly (1fr/1fr) since their rules text fills the bottom
 // half. Influence does not use this region — see `influenceBody`.
 const bodyRegion = cva({
@@ -213,7 +206,7 @@ const bodyTopMain = css({
 // its own gutter|1fr|gutter columns to reclaim that width instead of being
 // boxed into the parent's narrower `1fr` content track. The border-top divides
 // it from the top half (cost rail) above, matching the mid-tone `fieldTable`
-// already uses for its own slot/output divider.
+// already uses for its own capacity/output divider.
 const textBand = cva({
   base: {
     gridColumn: "1 / -1",
@@ -289,14 +282,6 @@ const influenceGroupName = css({
   letterSpacing: "0.02em"
 })
 
-// Dark fill for the cost badge on influence paper: the field kinds' `darkBand`
-// resolves to a light band for influence (see `darkBand`), which would vanish
-// against the near-white body, so the fulfilment cost inverts to a dark chip.
-const influenceCostFill = css({
-  background: "zinc.900",
-  color: "zinc.50"
-})
-
 // Lower row content: the bold group name followed by the goal / completion
 // condition (plus any timing preconditions) as one freeform paragraph.
 const influenceGoalContent = css({
@@ -332,85 +317,71 @@ const costRail = css({
   gap: "1"
 })
 
-// A dark band bleeding off the right edge — the horizontal twin of the header /
-// footer bands. Its box reaches the card edge, but the value is balanced about
-// the *cut* line (the real card boundary): it sits 2u inside the cut, mirroring
-// the 2u the icon sits inside the left edge, with the dark running past the cut
-// as bleed. paddingRight = bleed margin (gutter − 3u trim inset) + 2u match.
-// Only the left corners round, since the right runs off the cut.
-const costBadge = css({
-  display: "inline-flex",
-  alignItems: "center",
-  gap: "1",
-  borderStartStartRadius: "1",
-  borderEndStartRadius: "1",
-  paddingLeft: "2",
-  paddingRight: "calc(var(--gutter) - 1 * var(--u))",
-  paddingBlock: "1",
-  fontSize: "body",
-  fontWeight: 700,
-  fontVariantNumeric: "tabular-nums"
-})
-
 const icon = css({ width: "4", height: "4", flexShrink: 0 })
 
-// Worker->output table: a full-bleed banded zone in the body's lower row. The
-// table owns its own column lines — gutter | slot (1fr) | output (2fr) | gutter
-// — so it spans edge to edge (tinted background, plus a divider rule across the
-// top that splits the card) while the cells land in the safe column with no
-// margins or re-inset padding. The slot/output boundary carries a vertical rule,
-// and stacked slots are parted by soft horizontal rules.
+// Capacity->output table: a full-bleed banded zone in the body's lower row. The
+// table owns its own column lines — gutter | capacity (1fr) | output (2fr) |
+// gutter — so it spans edge to edge (tinted background, plus a divider rule
+// across the top that splits the card) while the cells land in the safe column
+// with no margins or re-inset padding. The capacity/output boundary carries a
+// vertical rule, and stacked rows are parted by soft horizontal rules.
 const fieldTable = css({
   gridColumn: "1 / -1",
   gridRow: "2",
   minHeight: 0,
   display: "grid",
-  gridTemplateColumns: "var(--gutter) 1fr 2fr var(--gutter)",
+  gridTemplateColumns: "var(--gutter) 1fr 3fr var(--gutter)",
   gridAutoRows: "1fr",
   borderTopWidth: "0.3mm",
   borderTopStyle: "solid",
-  borderTopColor: "brown.500",
-  background: "brown.900/6"
+  borderTopColor: "green.500",
+  background: "green.900/6"
 })
 
-const fieldSlotCell = css({
+const fieldCapacityCell = css({
   gridColumn: "2",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  gap: "0.5",
+  gap: "1",
   paddingBlock: "2",
+  fontWeight: 700,
+  fontVariantNumeric: "tabular-nums",
   borderInlineEndWidth: "0.3mm",
   borderInlineEndStyle: "solid",
-  borderInlineEndColor: "brown.500"
+  borderInlineEndColor: "green.500"
 })
 
 const fieldOutputCell = css({
   gridColumn: "3",
   display: "flex",
+  flexDirection: "column",
   alignItems: "center",
+  justifyContent: "center",
+  gap: "1",
   paddingBlock: "2",
-  paddingInlineStart: "3",
+  // Smallest size; the crate slots carry the meaning, so the spelled-out label
+  // is now just a redundant caption.
+  fontSize: "micro",
   fontWeight: 700,
   fontVariantNumeric: "tabular-nums"
+})
+
+// One crate slot per unit of yield, laid out in a row that wraps if the yield
+// exceeds the cell width.
+const fieldCrateRow = css({
+  display: "flex",
+  flexWrap: "wrap",
+  justifyContent: "center",
+  alignItems: "center",
+  gap: "1"
 })
 
 // Soft horizontal rule between stacked slots; omitted above the first row.
 const fieldRowDivider = css({
   borderTopWidth: "0.2mm",
   borderTopStyle: "solid",
-  borderTopColor: "brown.500/30"
-})
-
-// An empty slot a worker token drops into during harvest.
-const slotCircle = css({
-  width: "8",
-  height: "8",
-  borderRadius: "9999px",
-  borderWidth: "0.4mm",
-  borderStyle: "solid",
-  borderColor: "brown.500",
-  background: "brown.50"
+  borderTopColor: "green.500/30"
 })
 
 // Thin dark stripe mirroring the header: bleeds to the bottom edge, with
@@ -453,29 +424,11 @@ function assertNever(value: never): never {
   throw new Error(`Unhandled card kind: ${JSON.stringify(value)}`)
 }
 
-function WorkerCost({ workers, kind }: { workers: number; kind: CardKind }) {
-  return (
-    <span className={cx(costBadge, darkBand({ kind }))}>
-      <PersonStanding className={icon} />
-      {workers}
-    </span>
-  )
-}
-
-function GoldCost({ gold, kind }: { gold: number; kind: CardKind }) {
-  return (
-    <span className={cx(costBadge, darkBand({ kind }))}>
-      <Coins className={icon} />
-      {gold}
-    </span>
-  )
-}
-
-function CostRail({ cost, kind }: { cost: Cost; kind: CardKind }) {
+function CostRail({ cost }: { cost: Cost }) {
   return (
     <div className={costRail}>
-      {cost.workers > 0 && <WorkerCost workers={cost.workers} kind={kind} />}
-      {cost.gold > 0 && <GoldCost gold={cost.gold} kind={kind} />}
+      {cost.gold > 0 && <GoldCost amount={cost.gold} />}
+      {cost.workers > 0 && <WorkerCost amount={cost.workers} />}
     </div>
   )
 }
@@ -487,13 +440,19 @@ function fieldRegions(card: FieldCardBase): BodyRegions {
     top: null,
     bottom: (
       <div className={fieldTable}>
-        {card.slots.map((slot, i) => (
+        {card.rows.map((row, i) => (
           <Fragment key={i}>
-            <span className={cx(fieldSlotCell, i > 0 && fieldRowDivider)}>
-              {Array.from({ length: slot.workers }, (_, w) => <span key={w} className={slotCircle} />)}
+            <span className={cx(fieldCapacityCell, i > 0 && fieldRowDivider)}>
+              <ZodiacVirgo className={icon} />
+              {row.capacity}
             </span>
             <span className={cx(fieldOutputCell, i > 0 && fieldRowDivider)}>
-              {`${slot.amount} ${card.fruit}`}
+              <span className={fieldCrateRow}>
+                {Array.from({ length: row.amount }, (_, j) => (
+                  <FruitCrateSlot key={j} color={FRUIT_COLOR[card.fruit]} letter={card.fruit.charAt(0)} />
+                ))}
+              </span>
+              {`${row.amount} ${card.fruit}`}
             </span>
           </Fragment>
         ))}
@@ -521,18 +480,8 @@ function InfluenceBody({ card }: { card: InfluenceCardBase }) {
     <div className={influenceBody}>
       <div className={influenceArt} />
       <div className={costRail}>
-        {workers > 0 && (
-          <span className={cx(costBadge, influenceCostFill)}>
-            <PersonStanding className={icon} />
-            {workers}
-          </span>
-        )}
-        {gold > 0 && (
-          <span className={cx(costBadge, influenceCostFill)}>
-            <Coins className={icon} />
-            {gold}
-          </span>
-        )}
+        {gold > 0 && <GoldCost amount={gold} />}
+        {workers > 0 && <WorkerCost amount={workers} />}
       </div>
       <div className={influenceBand}>
         <div className={influenceGoalContent}>
@@ -546,18 +495,13 @@ function InfluenceBody({ card }: { card: InfluenceCardBase }) {
 
 function Footer({
   minPlayerCount,
-  kind,
-  fruit
+  kind
 }: {
   minPlayerCount: PlayerCount
   kind: CardKind
-  fruit?: FruitName | undefined
 }) {
   return (
-    <div
-      className={cx(footer, darkBand({ kind }))}
-      style={fruit ? { background: fieldBandBackground(fruit) } : undefined}
-    >
+    <div className={cx(footer, darkBand({ kind }))}>
       <div className={footerContent}>
         <span className={cx(playerPip, paperBorder({ kind }))}>{minPlayerCount}</span>
       </div>
@@ -587,7 +531,7 @@ function CardBody({ card }: { card: Card }) {
   return (
     <div className={bodyRegion({ kind: card.kind })}>
       <div className={bodyTopMain}>{regions.top}</div>
-      <CostRail cost={card.cost} kind={card.kind} />
+      <CostRail cost={card.cost} />
       {regions.bottom}
     </div>
   )
@@ -611,20 +555,13 @@ export function Card({
         variant === "trim" && accentOutline({ kind: card.kind })
       )}
     >
-      <div
-        className={cx(header, darkBand({ kind: card.kind }))}
-        style={card.kind === "field" ? { background: fieldBandBackground(card.fruit) } : undefined}
-      >
+      <div className={cx(header, darkBand({ kind: card.kind }))}>
         <div className={headerContent}>
           <span className={titleText}>{card.name}</span>
         </div>
       </div>
       <CardBody card={card} />
-      <Footer
-        minPlayerCount={card.minPlayerCount}
-        kind={card.kind}
-        fruit={card.kind === "field" ? card.fruit : undefined}
-      />
+      <Footer minPlayerCount={card.minPlayerCount} kind={card.kind} />
       {showGuides && variant === "bleed" && <Guides />}
     </div>
   )

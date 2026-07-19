@@ -1,0 +1,59 @@
+import { css } from "~/generated/styled-system/css"
+
+/**
+ * A Labor Market slot a worker token drops into: a 12x12 card-unit footprint
+ * with a stone rim, shaped as a regular octagon — a square with its corners
+ * clipped at 45°, so it fills the box (touching all four edges) with no stretch.
+ *
+ * A large, faint brown "W" is stamped in the middle (same idea as FruitCrateSlot's
+ * initial): pale enough to sit under a placed token, but enough to identify the
+ * slot — and it survives a black-and-white playtest print.
+ *
+ * Drawn as inline SVG so it stays print-crisp and scales with `--u`.
+ */
+
+// Geometry in the 0..12 viewBox (1 unit = 1mm at print). Regular octagon: LO/HI
+// are the inset box edges (outer rim sits on the box edge); CUT is the 45° corner
+// clip that makes all eight sides equal (side / (2 + sqrt2)).
+const STROKE = 0.4 // rim, matching the plain token slot
+const INSET = STROKE / 2
+const LO = INSET // 0.2
+const HI = 12 - INSET // 11.8
+const CUT = (HI - LO) / (2 + Math.SQRT2)
+const OCTAGON = [
+  `M ${LO + CUT} ${LO}`,
+  `L ${HI - CUT} ${LO}`,
+  `L ${HI} ${LO + CUT}`,
+  `L ${HI} ${HI - CUT}`,
+  `L ${HI - CUT} ${HI}`,
+  `L ${LO + CUT} ${HI}`,
+  `L ${LO} ${HI - CUT}`,
+  `L ${LO} ${LO + CUT}`,
+  "Z"
+].join(" ")
+
+const slot = css({ display: "block", width: "12", height: "12" })
+
+export function WorkerSlot({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className ? `${slot} ${className}` : slot}
+      viewBox="0 0 12 12"
+      role="img"
+      aria-label="worker slot"
+    >
+      <path d={OCTAGON} fill="var(--colors-brown-100)" stroke="var(--colors-stone-400)" strokeWidth={STROKE} />
+      <text
+        x={6}
+        y={6}
+        textAnchor="middle"
+        dominantBaseline="central"
+        fontSize={7.5}
+        fontWeight={700}
+        fill="var(--colors-brown-200)"
+      >
+        W
+      </text>
+    </svg>
+  )
+}

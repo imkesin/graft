@@ -1,11 +1,16 @@
 import { useEffect, useState } from "react"
-import { marketStalls } from "~/domain/MarketDefinitions"
 import { fieldDeck, previewCard } from "~/cards/fieldDeck"
 import { influenceDeck } from "~/cards/influenceDeck"
 import { Card } from "~/components/Card"
+import { GoldCost } from "~/components/icons/GoldCost"
+import { InducedDemand } from "~/components/icons/InducedDemand"
+import { WorkerCost } from "~/components/icons/WorkerCost"
+import { FruitCrateSlot } from "~/components/slots/FruitCrateSlot"
+import { WorkerSlot } from "~/components/slots/WorkerSlot"
 import { MarketStall } from "~/components/MarketStall"
 import { ZoomControl } from "~/components/ZoomControl"
-import { type FruitName, PLAYER_COUNTS, type PlayerCount } from "~/domain/CoreDefinitions"
+import { FRUIT_LIST_WITH_METADATA, type FruitName, PLAYER_COUNTS, type PlayerCount } from "~/domain/CoreDefinitions"
+import { marketStalls } from "~/domain/MarketDefinitions"
 import { css } from "~/generated/styled-system/css"
 
 const allCards = [
@@ -94,6 +99,32 @@ export function App() {
           induces={selectedStall.induces}
         />
       )}
+      <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+        <GoldCost amount={1} />
+        <GoldCost amount={7} />
+        <GoldCost amount={12} />
+        <GoldCost amount={88} />
+      </div>
+      <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+        <WorkerCost amount={1} />
+        <WorkerCost amount={7} />
+        <WorkerCost amount={12} />
+        <WorkerCost amount={88} />
+      </div>
+      <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+        <InducedDemand amount={1} />
+        <InducedDemand amount={2} />
+      </div>
+      <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+        {FRUIT_LIST_WITH_METADATA.map((f) => (
+          <FruitCrateSlot key={f.name} color={f.color} letter={f.name.charAt(0)} />
+        ))}
+      </div>
+      <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+        <WorkerSlot />
+        <WorkerSlot />
+        <WorkerSlot />
+      </div>
     </div>
   )
 }

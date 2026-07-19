@@ -333,7 +333,7 @@ export function BoardPrintPage() {
                 >
                   <MarketStall
                     fruit={stall.fruit}
-                    color={stall.color}
+                    color="stone"
                     slots={stall.demandTrack[players]}
                     induces={stall.induces}
                   />

@@ -15,8 +15,8 @@ const smallFields = FRUIT_LIST_WITH_METADATA.map(({ name, fieldName }) => ({
     4: 1
   },
   fruit: name,
-  slots: [
-    { workers: 1, amount: 1 }
+  rows: [
+    { capacity: 1, amount: 1 }
   ]
 })) satisfies ReadonlyArray<CardDefinition>
 
@@ -34,9 +34,9 @@ const wildFields = FRUIT_LIST_WITH_METADATA.map(({ name, fieldName }) => ({
     4: 1
   },
   fruit: name,
-  slots: [
-    { workers: 2, amount: 1 },
-    { workers: 1, amount: 1 }
+  rows: [
+    { capacity: 2, amount: 1 },
+    { capacity: 1, amount: 1 }
   ]
 })) satisfies ReadonlyArray<CardDefinition>
 
@@ -54,8 +54,8 @@ const remoteFields = FRUIT_LIST_WITH_METADATA.map(({ name, fieldName }) => ({
     4: 1
   },
   fruit: name,
-  slots: [
-    { workers: 2, amount: 2 }
+  rows: [
+    { capacity: 2, amount: 2 }
   ]
 })) satisfies ReadonlyArray<CardDefinition>
 
@@ -73,9 +73,9 @@ const mediumFields = FRUIT_LIST_WITH_METADATA.map(({ name, fieldName }) => ({
     4: 1
   },
   fruit: name,
-  slots: [
-    { workers: 1, amount: 1 },
-    { workers: 1, amount: 2 }
+  rows: [
+    { capacity: 1, amount: 1 },
+    { capacity: 1, amount: 2 }
   ]
 })) satisfies ReadonlyArray<CardDefinition>
 
@@ -93,9 +93,9 @@ const largeFields = FRUIT_LIST_WITH_METADATA.map(({ name, fieldName }) => ({
     4: 1
   },
   fruit: name,
-  slots: [
-    { workers: 1, amount: 2 },
-    { workers: 2, amount: 3 }
+  rows: [
+    { capacity: 1, amount: 2 },
+    { capacity: 2, amount: 3 }
   ]
 })) satisfies ReadonlyArray<CardDefinition>
 
@@ -166,7 +166,7 @@ export const fieldDeck: Deck = [
       3: 2,
       4: 3
     },
-    additionalText: "Whenever this Field is harvested with maximum Harvest Capacity, it yields +1 fruit."
+    additionalText: "Whenever this Field is harvested with maximum Harvest Capacity, it yields 1 additional Fruit."
   },
   {
     kind: "field-improvement",
@@ -182,7 +182,7 @@ export const fieldDeck: Deck = [
       4: 3
     },
     additionalText:
-      "Whenever this Field and at least 1 other Field are Harvested in the same action, you may retain 1 worker that would otherwise be returned to the Labor Supply."
+      "Whenever this Field and at least 1 other Field are harvested with maximum Harvest Capacity, you may retain 1 worker that would otherwise be returned to the Labor Supply."
   }
 ]
 

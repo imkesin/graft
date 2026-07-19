@@ -1,6 +1,6 @@
-import { Coins, PersonStanding } from "lucide-react"
+import { GoldCost } from "~/components/icons/GoldCost"
+import { WorkerCost } from "~/components/icons/WorkerCost"
 import { darkBand, paperFrame } from "~/components/paperFrame"
-import { icon, value } from "~/components/trackSlot"
 import type { Infrastructure, InfrastructureTrackLevel } from "~/domain/InfrastructureDefinitions"
 import { css, cx } from "~/generated/styled-system/css"
 
@@ -14,11 +14,11 @@ import { css, cx } from "~/generated/styled-system/css"
  * lands (see `~/board/domain`).
  */
 
-// paperFrame/darkBand tint per infrastructure type — distinct hues so the
-// tracks read apart at a glance when stacked in the board's infra column.
+// paperFrame/darkBand tint per infrastructure type. Uniform stone for now to
+// keep the board calm; per-track hues are a later differentiation pass.
 const KIND_COLOR = {
-  Ports: "cyan",
-  Railways: "amber"
+  Ports: "stone",
+  Railways: "stone"
 } as const satisfies Record<Infrastructure, string>
 
 const frame = css({
@@ -79,10 +79,10 @@ const levelMark = css({
   flexShrink: 0
 })
 
-// Workers over gold, so a level with both stacks compactly in the narrow column.
+// Worker and gold sit side by side (left to right) in the cost column.
 const cost = css({
-  display: "grid",
-  justifyItems: "start",
+  display: "flex",
+  alignItems: "center",
   gap: "0.5"
 })
 
@@ -115,18 +115,8 @@ export function InfraTrack(
           <div key={i} className={cx(level, i === levels.length - 1 && lastLevel)}>
             <span className={levelMark}>{i + 1}</span>
             <div className={cost}>
-              {l.cost.workers > 0 && (
-                <span className={value}>
-                  <PersonStanding className={icon} />
-                  {l.cost.workers}
-                </span>
-              )}
-              {l.cost.gold > 0 && (
-                <span className={value}>
-                  <Coins className={icon} />
-                  {l.cost.gold}
-                </span>
-              )}
+              {l.cost.gold > 0 && <GoldCost amount={l.cost.gold} />}
+              {l.cost.workers > 0 && <WorkerCost amount={l.cost.workers} />}
             </div>
             <span className={effect}>{effectText(l)}</span>
           </div>

@@ -37,15 +37,15 @@ export type AdditionalCost = {
 export type Copies = Record<PlayerCount, number>
 
 /**
- * One worker slot on a Field, filled in order. `amount` is the INCREMENTAL
- * fruit this slot yields. A medium field
- *   [{ workers: 1, amount: 1 }, { workers: 2, amount: 2 }]
- * yields 1 fruit with one worker and 3 with two; a small field is a single
- * slot. `workers` is explicit so a future slot needing >1 worker fits without
- * reshaping the model.
+ * One harvest row on a Field, unlocked in order. `capacity` is the Harvest
+ * Capacity that row demands; `amount` is the INCREMENTAL fruit it yields. A
+ * medium field
+ *   [{ capacity: 1, amount: 1 }, { capacity: 2, amount: 2 }]
+ * yields 1 fruit at capacity 1 and 3 total at capacity 2; a small field is a
+ * single row.
  */
-export type WorkerSlot = {
-  readonly workers: number
+export type HarvestRow = {
+  readonly capacity: number
   readonly amount: number
 }
 
@@ -56,7 +56,7 @@ export type FieldCardBase = {
   readonly name: string
   readonly cost: Cost
   readonly fruit: FruitName
-  readonly slots: readonly WorkerSlot[]
+  readonly rows: readonly HarvestRow[]
 }
 
 export type FieldImprovementCardBase = {

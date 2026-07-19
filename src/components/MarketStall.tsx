@@ -1,9 +1,18 @@
-import { Coins, TrendingUp } from "lucide-react"
+import { GoldCost } from "~/components/icons/GoldCost"
+import { InducedDemand } from "~/components/icons/InducedDemand"
 import { darkBand, paperFrame } from "~/components/paperFrame"
-import { icon, tokenSlot, value } from "~/components/trackSlot"
+import { FruitCrateSlot } from "~/components/slots/FruitCrateSlot"
+import { value } from "~/components/trackSlot"
+import { FRUIT_LIST_WITH_METADATA } from "~/domain/CoreDefinitions"
 import type { FruitColor, FruitName } from "~/domain/CoreDefinitions"
 import type { DemandSlot } from "~/domain/MarketDefinitions"
 import { css, cx } from "~/generated/styled-system/css"
+
+// A crate slot is tinted by its fruit's own colour, independent of the stall
+// frame's colour (which the board flattens to stone) — see FruitCrateSlot.
+const FRUIT_COLOR: Record<FruitName, FruitColor> = Object.fromEntries(
+  FRUIT_LIST_WITH_METADATA.map((f) => [f.name, f.color])
+) as Record<FruitName, FruitColor>
 
 /**
  * A fruit's market stall: header names the fruit, the demand track below is a
@@ -96,22 +105,12 @@ export function MarketStall({
       <div className={track}>
         {slots.map((s, i) => (
           <div key={i} className={cx(slot, i === slots.length - 1 && lastSlot)}>
-            <span className={tokenSlot({ size: "lg", shape: "square" })} />
+            <FruitCrateSlot color={FRUIT_COLOR[fruit]} letter={fruit.charAt(0)} />
             <span className={value}>
-              {s.gold > 0 && (
-                <>
-                  <Coins className={icon} />
-                  {s.gold}
-                </>
-              )}
+              {s.gold > 0 && <GoldCost amount={s.gold} />}
             </span>
             <span className={value}>
-              {s.inducedDemand > 0 && (
-                <>
-                  <TrendingUp className={icon} />
-                  {s.inducedDemand}
-                </>
-              )}
+              {s.inducedDemand > 0 && <InducedDemand amount={s.inducedDemand} />}
             </span>
           </div>
         ))}
