@@ -36,17 +36,19 @@ const header = css({
   paddingBlock: "2"
 })
 
-const track = css({
-  display: "grid",
-  gridAutoFlow: "row",
-  gridAutoRows: "1fr"
-})
+// Each tier's height is weighted by how many slot rows it holds (two slots per
+// row), so a crowded tier gets proportionally more room than a sparse one
+// instead of every tier splitting the height evenly.
+const track = css({ display: "grid" })
 
+const SLOTS_PER_ROW = 2
+
+// The slots sit centred in the tier; the cost is lifted out of flow and pinned
+// to the top-right corner so it hugs the walls instead of reserving a column.
 const tier = css({
+  position: "relative",
   display: "grid",
-  gridTemplateColumns: "auto 1fr",
-  alignItems: "center",
-  gap: "3",
+  placeItems: "center",
   paddingInline: "3",
   borderBottomWidth: "0.2mm",
   borderBottomStyle: "solid",
@@ -55,22 +57,28 @@ const tier = css({
 
 const lastTier = css({ borderBottomWidth: 0 })
 
+const cost = css({
+  position: "absolute",
+  top: "1",
+  right: "1"
+})
+
 // Two fixed columns; workers beyond 2 wrap onto further rows, so a tall tier
 // grows down rather than crowding a single wide line.
 const tokens = css({
   display: "grid",
   gridTemplateColumns: "repeat(2, auto)",
-  justifyContent: "flex-end",
+  justifyContent: "center",
   alignContent: "center",
   gap: "1"
 })
 
 // With an odd worker count the right column has one fewer slot; dropping it by
-// half the vertical pitch (half of the 12u slot + 1u row gap = 6.5u) nestles
+// half the vertical pitch (half of the 18u slot + 1u row gap = 9.5u) nestles
 // those slots between the left column's instead of leaving a lone gap.
 const staggered = css({
   "& > :nth-child(even)": {
-    transform: "translateY(calc(6.5 * var(--u)))"
+    transform: "translateY(calc(9.5 * var(--u)))"
   }
 })
 
@@ -78,10 +86,15 @@ export function LaborSupply({ track: tiers }: { track: readonly LaborSupplyTier[
   return (
     <div className={cx(frame, paperFrame({ color: "stone" }))}>
       <div className={cx(header, darkBand({ color: "stone" }))}>Labor Supply</div>
-      <div className={track}>
+      <div
+        className={track}
+        style={{ gridTemplateRows: tiers.map((t) => `${Math.ceil(t.slots.length / SLOTS_PER_ROW)}fr`).join(" ") }}
+      >
         {tiers.map((t, i) => (
           <div key={i} className={cx(tier, i === tiers.length - 1 && lastTier)}>
-            <GoldCost amount={t.gold} />
+            <span className={cost}>
+              <GoldCost amount={t.gold} />
+            </span>
             <div className={cx(tokens, t.slots.length % 2 === 1 && staggered)}>
               {t.slots.map((minPlayers, j) => (
                 <WorkerSlot key={j} badge={minPlayers > BASE_PLAYERS ? `${minPlayers}+` : undefined} />
