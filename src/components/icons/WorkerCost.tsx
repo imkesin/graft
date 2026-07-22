@@ -60,10 +60,14 @@ const FONT = 3.0 // fits two tabular digits within the band
 
 const badge = css({ display: "block", width: "10", height: "10" })
 
-export function WorkerCost({ amount, className }: { amount: number; className?: string }) {
+export function WorkerCost({ amount, size, className }: { amount: number; size?: number; className?: string }) {
+  // `size` (in card units) overrides the default 10u box via inline style,
+  // which reliably wins over the `badge` class regardless of stylesheet order.
+  const sizeStyle = size ? { width: `calc(${size} * var(--u))`, height: `calc(${size} * var(--u))` } : undefined
   return (
     <svg
       className={className ? `${badge} ${className}` : badge}
+      style={sizeStyle}
       viewBox="0 0 10 10"
       role="img"
       aria-label={`${amount} workers`}

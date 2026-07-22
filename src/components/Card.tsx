@@ -1,4 +1,4 @@
-import { ZodiacVirgo } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import { Fragment, type ReactNode } from "react"
 import type { Card, CardBase, Cost, FieldCardBase, FieldImprovementCardBase, InfluenceCardBase } from "~/cards/domain"
 import { GoldCost } from "~/components/icons/GoldCost"
@@ -313,8 +313,6 @@ const costRail = css({
   gap: "1"
 })
 
-const icon = css({ width: "4", height: "4", flexShrink: 0 })
-
 // Capacity->output table: a full-bleed banded zone in the body's lower row. The
 // table owns its own column lines — gutter | capacity (1fr) | output (2fr) |
 // gutter — so it spans edge to edge (tinted background, plus a divider rule
@@ -335,6 +333,7 @@ const fieldTable = css({
 })
 
 const fieldCapacityCell = css({
+  position: "relative",
   gridColumn: "2",
   display: "flex",
   alignItems: "center",
@@ -347,6 +346,27 @@ const fieldCapacityCell = css({
   borderInlineEndStyle: "solid",
   borderInlineEndColor: "green.500"
 })
+
+// A green right-arrow chip straddling the capacity/output divider: it sits on
+// the vertical rule (right edge, vertically centred) and points into the output
+// cell, drawing the "this many workers -> this yield" association across the row.
+// A paper-coloured disc lets it punch cleanly through the divider line.
+const fieldRowArrow = css({
+  position: "absolute",
+  insetInlineEnd: 0,
+  top: "50%",
+  transform: "translate(50%, -50%)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  width: "5",
+  height: "5",
+  borderRadius: "9999px",
+  background: "green.50",
+  color: "green.700"
+})
+
+const fieldRowArrowIcon = css({ width: "3", height: "3" })
 
 const fieldOutputCell = css({
   gridColumn: "3",
@@ -439,8 +459,10 @@ function fieldRegions(card: FieldCardBase): BodyRegions {
         {card.rows.map((row, i) => (
           <Fragment key={i}>
             <span className={cx(fieldCapacityCell, i > 0 && fieldRowDivider)}>
-              <ZodiacVirgo className={icon} />
-              {row.capacity}
+              <WorkerCost amount={row.capacity} size={7} />
+              <span className={fieldRowArrow} aria-hidden>
+                <ArrowRight className={fieldRowArrowIcon} />
+              </span>
             </span>
             <span className={cx(fieldOutputCell, i > 0 && fieldRowDivider)}>
               <span className={fieldCrateRow}>

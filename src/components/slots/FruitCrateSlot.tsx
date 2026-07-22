@@ -54,7 +54,7 @@ export function FruitCrateSlot(
 ) {
   const stamp = badge ?? letter
   const fillColor = fill ?? (color ? token(`colors.${color}.100`) : "white")
-  const inkColor = ink ?? (color ? token(`colors.${color}.200`) : token("colors.stone.200"))
+  const inkColor = ink ?? (color ? token(`colors.${color}.400`) : token("colors.stone.400"))
   // `size` (in card units) overrides the default 12u square via inline style,
   // which reliably wins over the `slot` class regardless of stylesheet order.
   const sizeStyle = size ? { width: `calc(${size} * var(--u))`, height: `calc(${size} * var(--u))` } : undefined
