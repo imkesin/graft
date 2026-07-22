@@ -34,6 +34,9 @@ const NUM_Y = 7.0 // count centre in the lower half
 
 const badge = css({ display: "block", width: "10", height: "10" })
 
+/**
+ * @deprecated Invest/Infrastructure removed from the board; retained but unused.
+ */
 export function FieldDiscard({ amount, className }: { amount: number; className?: string }) {
   return (
     <svg

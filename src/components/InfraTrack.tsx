@@ -122,6 +122,9 @@ const turn = css({
 
 const lastRow = css({ borderBottomWidth: 0 })
 
+/**
+ * @deprecated Invest/Infrastructure removed from the board; retained but unused.
+ */
 export function InfraTrack(
   { kind, levels }: { kind: Infrastructure; levels: readonly InfrastructureTrackLevel[] }
 ) {
@@ -157,9 +160,7 @@ export function InfraTrack(
                 )}
               </div>
               <div className={cx(turn, last && lastRow)}>
-                {l.immediateBonus?.additionalTurns != null && (
-                  <AnotherTurn amount={l.immediateBonus.additionalTurns} />
-                )}
+                {l.immediateBonus?.additionalTurns != null && <AnotherTurn amount={l.immediateBonus.additionalTurns} />}
               </div>
               <div className={cx(payoff, last && lastRow)}>
                 {l.commonBonus?.transportCapacityIncrease != null && (

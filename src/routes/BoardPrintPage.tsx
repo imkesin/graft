@@ -1,9 +1,7 @@
 import { CARD_TRIM_H_MM, CARD_TRIM_W_MM } from "~/cards/cardSize"
-import { InfraTrack } from "~/components/InfraTrack"
 import { LaborSupply } from "~/components/LaborSupply"
 import { MarketStall } from "~/components/MarketStall"
 import { WorkerZone } from "~/components/WorkerZone"
-import { infrastructureTracks } from "~/domain/InfrastructureDefinitions"
 import { laborSupply } from "~/domain/LaborSupplyDefinitions"
 import { marketStalls } from "~/domain/MarketDefinitions"
 import { css } from "~/generated/styled-system/css"
@@ -22,13 +20,12 @@ import { css } from "~/generated/styled-system/css"
  * full 2u lane, which the flex/TBD zone of its grid absorbs — the `market`
  * (outer) and `emptyZone` placeholder (top band).
  *
- * The board seats the game's six worker-placement zones (one per Focus) as far
+ * The board seats the game's five worker-placement zones (one per Focus) as far
  * apart as the sheet allows, pairing each with the supply it draws on. The
- * bottom band holds the three economy engines (a track + its zone); the top band
- * holds the three card/field actions (a card supply stacked over its zone, or
- * just a zone where there's no supply):
+ * bottom band holds the two economy engines (the market, and the Labor Market
+ * track + its zone); the top band holds the three card/field actions (a card
+ * supply stacked over its zone, or just a zone where there's no supply):
  *
- *     bottom-left  Infrastructure track  + Invest zone
  *     bottom-mid   Market ellipse        + Sell zone (dead centre)
  *     bottom-right Labor Market track    + Recruit zone
  *     top-left     Influence Card supply + Influence zone
@@ -39,30 +36,29 @@ import { css } from "~/generated/styled-system/css"
  * tracks: the outer grid's columns serve only the bottom band, and the top band
  * (`topBand`) is a nested full-width grid with its own columns.
  *
- *   outer columns (u): 7 1 33 1 4  (= 46u = 23in)  [infra gutter market gutter workers]
+ * The former bottom-left `infra` column (Infrastructure tracks + Invest zone)
+ * has been removed; its ~4in was absorbed mostly by the market (which grows from
+ * 16.5in to 20in wide) and a little by the labor column (2in to 2.5in wide).
+ *
+ *   outer columns (u): 40 1 5  (= 46u = 23in)  [market gutter workers]
  *   outer rows (u):    11 1 17 1 4  (= 34u = 17in)
  *                        (market spans the bottom three rows = 22u = 11in)
  *
  *   outer gridTemplateAreas:
- *     "topBand topBand topBand topBand topBand"
- *     ".       .      .      .      ."
- *     "infra   .      market .      workers"
- *     "infra   .      market .      workers"
- *     "infra   .      market .      workers"
+ *     "topBand topBand topBand"
+ *     ".       .      ."
+ *     "market  .      workers"
+ *     "market  .      workers"
+ *     "market  .      workers"
  *
  *   `topBand` spans the full 46u top row and holds its own grid:
  *     top columns (u): 12 1 14 1 18  (= 46u = 23in)
  *     top areas:   "cardsL . harvest . cardsR"
  *
- *   - `infra`: bottom-left 3.5x11in (7u-wide) column spanning all three bottom
- *     rows, holding the infrastructure upgrade tracks (Ports/Railways) stacked
- *     evenly with the Invest zone tucked below them, framed together. Separated
- *     from the market by a 1u (0.5in) gutter.
- *   - `market`: bottom 17x11in block (col 3, spanning all three bottom rows),
+ *   - `market`: bottom 20x11in block (col 1, spanning all three bottom rows),
  *     the 7 MarketStalls on an ellipse (kept upright for legibility) with the
- *     Sell zone at its centre. Ellipse is deliberately not yet re-fit to the
- *     narrower cell.
- *   - `workers`: bottom-right 2x11in (4u-wide) column spanning all three bottom
+ *     Sell zone at its centre.
+ *   - `workers`: bottom-right 2.5x11in (5u-wide) column spanning all three bottom
  *     rows, holding the Labor Market with the Recruit zone tucked below it,
  *     framed together.
  *   - `cardsL`: 6in column — two Influence Card outlines over the Influence zone.
@@ -72,16 +68,14 @@ import { css } from "~/generated/styled-system/css"
  *   - The 1u buffer columns/gutter and the 1u buffer rows are real empty grid
  *     cells, so `gap` is 0.
  *
- * RADIUS_X/Y were sized against MarketStall's former footprint (7 demand slots
- * wide) so the ring inscribes the ~19x11in market cell with a few mm of
- * clearance. The single-board stall is now 5 columns wide but up to two crates
- * tall, so the footprint has shifted (narrower, taller) — the ring likely wants
- * re-fitting. With 7 stalls anchored at the top vertex the ring's vertical
+ * RADIUS_X is sized to the widened 20in market cell so the ring spreads into the
+ * space freed by dropping the infra column; RADIUS_Y still fits the unchanged
+ * 11in height. With 7 stalls anchored at the top vertex the ring's vertical
  * extremes are asymmetric (top sin=-1.0, bottom sin=+0.90), so OFFSET_Y nudges
  * it down to visually center the ellipse within the cell.
  */
 
-const RADIUS_X = 160
+const RADIUS_X = 205
 const RADIUS_Y = 105
 const OFFSET_Y = 5
 const STALL_COUNT = 7
@@ -140,10 +134,9 @@ const sheetStyle = css({
   boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
   flex: "none",
   display: "grid",
-  gridTemplateColumns: "3.5in 0.5in 16.5in 0.5in 2in",
+  gridTemplateColumns: "20in 0.5in 2.5in",
   gridTemplateRows: "5.5in 0.5in 8.5in 0.5in 2in",
-  gridTemplateAreas:
-    `"topBand topBand topBand topBand topBand" ". . . . ." "infra . market . workers" "infra . market . workers" "infra . market . workers"`,
+  gridTemplateAreas: `"topBand topBand topBand" ". . ." "market . workers" "market . workers" "market . workers"`,
   gap: 0,
   padding: "0.5in"
 })
@@ -214,32 +207,15 @@ const zoneCell = css({
   justifyContent: "center"
 })
 
-// The infra and workers columns each span the full 11in bottom band, framing
-// their track (top) and its worker zone (bottom, ~1.5in) as one dev-outlined
-// region. `1fr auto` lets the track fill and the zone take its natural height.
-const infraArea = css({
-  ...devOutline,
-  gridArea: "infra",
-  display: "grid",
-  gridTemplateRows: "1fr auto",
-  gap: "0.25in"
-})
-
+// The workers column spans the full 11in bottom band, framing its track (top)
+// and its worker zone (bottom, ~1.5in) as one dev-outlined region. `1fr auto`
+// lets the track fill and the zone take its natural height.
 const workersArea = css({
   ...devOutline,
   gridArea: "workers",
   display: "grid",
   gridTemplateRows: "1fr auto",
   gap: "0.25in"
-})
-
-// The infrastructure tracks stack vertically, filling the infra column's track
-// region evenly however many there are; each carries its own frame.
-const infraTracks = css({
-  display: "grid",
-  gridAutoRows: "1fr",
-  gap: "0.25in",
-  minHeight: 0
 })
 
 const gameArea = css({
@@ -295,16 +271,6 @@ export function BoardPrintPage() {
             <LaborSupply track={laborSupply.workerTrack} />
             <div className={zoneCell}>
               <WorkerZone label="Recruit" />
-            </div>
-          </div>
-          <div className={infraArea}>
-            <div className={infraTracks}>
-              {infrastructureTracks.map((infra) => (
-                <InfraTrack key={infra.kind} kind={infra.kind} levels={infra.levels} />
-              ))}
-            </div>
-            <div className={zoneCell}>
-              <WorkerZone label="Invest" />
             </div>
           </div>
           <div className={gameArea}>

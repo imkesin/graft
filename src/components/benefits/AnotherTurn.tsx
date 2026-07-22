@@ -34,6 +34,9 @@ const IY = C - ICON / 2 // 3.7
 
 const badge = css({ display: "block", width: "12", height: "12" })
 
+/**
+ * @deprecated Invest/Infrastructure removed from the board; retained but unused.
+ */
 export function AnotherTurn({ amount, className }: { amount: number; className?: string }) {
   return (
     <svg

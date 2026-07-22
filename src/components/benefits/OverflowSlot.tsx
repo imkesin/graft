@@ -27,6 +27,9 @@ const coin = css({ position: "absolute", top: 0, right: 0 })
 
 const wrapSize = { width: `calc(${SIZE} * var(--u))`, height: `calc(${SIZE} * var(--u))` }
 
+/**
+ * @deprecated Invest/Infrastructure removed from the board; retained but unused.
+ */
 export function OverflowSlot({ amount, className }: { amount: number; className?: string }) {
   return (
     <div className={className ? `${wrap} ${className}` : wrap} style={wrapSize}>

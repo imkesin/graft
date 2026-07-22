@@ -52,6 +52,9 @@ const FONT = 3.0
 
 const badge = css({ display: "block", width: "10", height: "10" })
 
+/**
+ * @deprecated Invest/Infrastructure removed from the board; retained but unused.
+ */
 export function WorkerRemove({ amount, className }: { amount: number; className?: string }) {
   return (
     <svg

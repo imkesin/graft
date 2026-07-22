@@ -1,6 +1,15 @@
+/**
+ * @deprecated Invest/Infrastructure removed from the board; retained but unused.
+ */
 export const INFRASTRUCTURE_LIST = ["Ports", "Railways"] as const
+/**
+ * @deprecated Invest/Infrastructure removed from the board; retained but unused.
+ */
 export type Infrastructure = typeof INFRASTRUCTURE_LIST[number]
 
+/**
+ * @deprecated Invest/Infrastructure removed from the board; retained but unused.
+ */
 export const INFRASTRUCTURE_LEVELS = 5
 
 type InfrastructureUpgradeCost = {
@@ -19,17 +28,26 @@ type InfrastructureCommonBonus = {
   readonly marketOverflowSlotPayoff?: number
 }
 
+/**
+ * @deprecated Invest/Infrastructure removed from the board; retained but unused.
+ */
 export type InfrastructureTrackLevel = {
   readonly cost: InfrastructureUpgradeCost
   readonly immediateBonus?: InfrastructureImmediateBonus
   readonly commonBonus?: InfrastructureCommonBonus
 }
 
+/**
+ * @deprecated Invest/Infrastructure removed from the board; retained but unused.
+ */
 export type InfraTrackDefinition = {
   readonly kind: Infrastructure
   readonly levels: readonly InfrastructureTrackLevel[]
 }
 
+/**
+ * @deprecated Invest/Infrastructure removed from the board; retained but unused.
+ */
 export const infrastructureTracks: readonly InfraTrackDefinition[] = [
   {
     kind: "Railways",

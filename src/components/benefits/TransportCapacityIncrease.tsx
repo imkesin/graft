@@ -45,6 +45,9 @@ const FONT = 2.8
 // payoffs read at the same size; the 0..12 viewBox scales up uniformly.
 const badge = css({ display: "block", width: "15", height: "15" })
 
+/**
+ * @deprecated Invest/Infrastructure removed from the board; retained but unused.
+ */
 export function TransportCapacityIncrease({ amount, className }: { amount: number; className?: string }) {
   return (
     <svg

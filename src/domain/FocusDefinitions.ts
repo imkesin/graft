@@ -2,7 +2,6 @@ export const FOCUSES = [
   "Expand",
   "Harvest",
   "Influence",
-  "Invest",
   "Recruit",
   "Sell"
 ] as const
@@ -42,16 +41,6 @@ export const FOCUS_ACTION_METADATA = {
         name: "Suppress",
         ruleDescription:
           "Select 1 of the face-up Influence Cards and move it to the bottom of the Influence Card Supply. Pay 2 Gold, plus 2 additional Gold for each Influence Card in your player zone. Lastly, fill the empty space on the board."
-      }
-    ]
-  },
-  Invest: {
-    actions: [
-      {
-        id: "invest-infrastructure",
-        name: "Infrastructure",
-        ruleDescription:
-          "Advance one of the Infrastructure Tracks by 1 space, and pay the cost indicated on the new space. Then, if there is a one-time bonus on the new space, claim the bonus."
       }
     ]
   },
