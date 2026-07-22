@@ -11,16 +11,10 @@ export const FOCUS_ACTION_METADATA = {
   Expand: {
     actions: [
       {
-        id: "expand-claim",
-        name: "Claim",
+        id: "expand-expand",
+        name: "Expand",
         ruleDescription:
-          "Select 1 of the visible Field Cards and put it into your hand; you collect all gold it. Then, pay 1 Gold for each Field you have cultivated.\n\nIf you hold more than 7 Field Cards, you must discard down to 7 by placing them face-down at the bottom of the Field Card Supply.\n\nLastly, fill the empty space on the board."
-      },
-      {
-        id: "expand-cultivate",
-        name: "Cultivate",
-        ruleDescription:
-          "Reveal a Field Card from your hand, placing it in your Player Zone, and pay the cost listed on the card. If you have played a Field Improvement card, then you must attach it to an existing field. Then, place 1 Gold from Supply on 1 face-up Field Card in one of the slots on the Board."
+          "Select 1 of the visible Field Cards, collect all gold it, and place it in your player zone. Or, reveal 1 Field Card from your hand and place it in your Player Zone.\n\nImmediately pay the cost listed on the card. Each Family Worker in the Expand zone is counted toward the Worker cost\n\nIf necessary, fill any empty expansion space on the Board. Place 1 coin from Supply on each visible Field Card."
       }
     ]
   },
@@ -30,17 +24,17 @@ export const FOCUS_ACTION_METADATA = {
         id: "harvest-harvest",
         name: "Harvest",
         ruleDescription:
-          "Produce 1 or more Fruits from your Fields, leaving each on the Field that produced it. You have a baseline Harvest Capacity of 1, and each additional worker applied to this action increases capacity by 1.\n\nHarvest Rows must be worked from top to bottom and do not produce any Fruit when partially filled.\n\nA field with any number of Fruits already on it may not be Harvested; they must be taken to market."
+          "Produce 1 or more Fruits from your Fields by assigning Workers to their rows.\n\nRows must be worked from top to bottom. Each of your Family Workers in the Harvest zone is counted toward the Worker cost.\n\nA field with any number of Fruits already on it may not be harvested; they must be taken to market first."
       }
     ]
   },
   Influence: {
     actions: [
       {
-        id: "influence-suppress",
-        name: "Suppress",
+        id: "influence-influence",
+        name: "Influence",
         ruleDescription:
-          "Select 1 of the face-up Influence Cards and move it to the bottom of the Influence Card Supply. Pay 2 Gold, plus 2 additional Gold for each Influence Card in your player zone. Lastly, fill the empty space on the board."
+          "Pay 1 Gold for each Influence Card you have in play.\n\nLook at the top card of the Influence Supply. You may put it back on top, move it to the bottom of the Supply, or you may put it face-up in the Influence zone. If you reveal it face-up, move one of the other Influence cards to the bottom of the Supply.\n\nRepeat the process for each additional Family Worker already in the Influence zone."
       }
     ]
   },
@@ -50,7 +44,7 @@ export const FOCUS_ACTION_METADATA = {
         id: "recruit-recruit",
         name: "Recruit",
         ruleDescription:
-          "Hire 1 or more Workers from the Labor Pool and pay their corresponding costs.\n\nIf, at the start of your turn, you employed fewer workers than another player, you may Poach any number of workers by paying 1 additional Gold more the highest cost listed in the labor pool."
+          "Hire the lowest cost Worker for free. Then, you may hire any number of Workers from the labor pool by paying their cost in Gold.\n\nRepeat the process for each additional Family Worker already in the Recruit zone.\n\nIf, at the start of your turn, you employed fewer Workers than another player, you may Poach any number of workers from other Players by paying 1 Gold more than the highest cost listed in the labor pool."
       }
     ]
   },
@@ -60,7 +54,7 @@ export const FOCUS_ACTION_METADATA = {
         id: "sell-sell",
         name: "Sell",
         ruleDescription:
-          "Move 1 or more Fruit Crates from your Fields to the Market.\n\nYou have a baseline Transport Capacity of 1. But, each Worker applied to this action increases your Transport Capacity by 2.\n\nPlace Fruit Crates into the empty slots in the Market and collect the corresponding amount of Gold. Then, induce demand by removing other Fruit Crates from their Demand Tracks and returning them to Supply. You collect 1 additional Gold for every Fruit Crate removed this way."
+          "Move 1 or more Fruits from your Fields to the Market.\n\nFor each Family Worker in the Sell zone, you may transport any number of Fruits of 1 type. For each additional Worker assigned to this action, you may transport 1 additional type of Fruit.\n\nPlace Fruit Crates into the empty slots in the Market and collect the corresponding amount of Gold.\n\nThen, induce demand by removing other Fruits from their Demand Tracks and returning them to Supply. You collect 1 additional Gold for every Fruit Crate removed through induced demand."
       }
     ]
   }
