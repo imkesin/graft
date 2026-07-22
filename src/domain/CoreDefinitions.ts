@@ -1,4 +1,4 @@
-export const PLAYER_COUNTS = [2, 3, 4] as const
+export const PLAYER_COUNTS = [2, 3, 4, 5] as const
 export type PlayerCount = typeof PLAYER_COUNTS[number]
 
 export const FRUIT_LIST_WITH_METADATA = [

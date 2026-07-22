@@ -6,13 +6,14 @@ const smallFields = FRUIT_LIST_WITH_METADATA.map(({ name, fieldName }) => ({
   id: `sm-${name.toLowerCase()}-field`,
   name: `Small ${name} ${fieldName}`,
   cost: {
-    workers: 1,
+    workers: 2,
     gold: 6
   },
   copies: {
     2: 1,
     3: 1,
-    4: 1
+    4: 1,
+    5: 1
   },
   fruit: name,
   rows: [
@@ -26,12 +27,13 @@ const wildFields = FRUIT_LIST_WITH_METADATA.map(({ name, fieldName }) => ({
   name: `Wild ${name} ${fieldName}`,
   cost: {
     gold: 2,
-    workers: 0
+    workers: 1
   },
   copies: {
-    2: 1,
-    3: 1,
-    4: 1
+    2: 0,
+    3: 0,
+    4: 0,
+    5: 1
   },
   fruit: name,
   rows: [
@@ -46,12 +48,13 @@ const remoteFields = FRUIT_LIST_WITH_METADATA.map(({ name, fieldName }) => ({
   name: `Remote ${name} ${fieldName}`,
   cost: {
     gold: 4,
-    workers: 1
+    workers: 2
   },
   copies: {
     2: 0,
     3: 0,
-    4: 1
+    4: 1,
+    5: 1
   },
   fruit: name,
   rows: [
@@ -65,12 +68,13 @@ const mediumFields = FRUIT_LIST_WITH_METADATA.map(({ name, fieldName }) => ({
   name: `Medium ${name} ${fieldName}`,
   cost: {
     gold: 8,
-    workers: 2
+    workers: 3
   },
   copies: {
     2: 1,
     3: 1,
-    4: 1
+    4: 1,
+    5: 1
   },
   fruit: name,
   rows: [
@@ -85,12 +89,13 @@ const largeFields = FRUIT_LIST_WITH_METADATA.map(({ name, fieldName }) => ({
   name: `Large ${name} ${fieldName}`,
   cost: {
     gold: 10,
-    workers: 3
+    workers: 4
   },
   copies: {
     2: 0,
     3: 1,
-    4: 1
+    4: 1,
+    5: 1
   },
   fruit: name,
   rows: [
@@ -101,25 +106,26 @@ const largeFields = FRUIT_LIST_WITH_METADATA.map(({ name, fieldName }) => ({
 
 export const fieldDeck: Deck = [
   ...smallFields,
-  ...wildFields,
-  ...remoteFields,
   ...mediumFields,
   ...largeFields,
+  ...remoteFields,
+  ...wildFields,
   {
     kind: "field-improvement",
     id: "local-workforce",
     name: "Local Workforce",
     cost: {
-      workers: 0,
-      gold: 2
+      workers: 1,
+      gold: 0
     },
     copies: {
       2: 2,
       3: 3,
-      4: 3
+      4: 4,
+      5: 4
     },
     additionalText:
-      "During a Harvest, you may pay 1 Gold to increase your Harvest Capacity by 1. The additional capacity can only be applied to rows on the attached Field."
+      "During a Harvest, you may pay 1 Gold to get a Temporary Worker. This Worker can only be applied to rows on the attached Field, and is immediately removed afterwards."
   },
   {
     kind: "field-improvement",
@@ -132,10 +138,11 @@ export const fieldDeck: Deck = [
     copies: {
       2: 2,
       3: 3,
-      4: 3
+      4: 4,
+      5: 4
     },
     additionalText:
-      "Whenever you Sell, you may remove 1 Fruit from this Field rather than taking it to market. If you do, collect 2 Gold. This does not require any Transport Capacity."
+      "Whenever you Sell, you may remove 1 Fruit from this Field rather than taking it to market. If you do, collect 2 Gold. This does not count as an additional type being brought to the Market."
   },
   {
     kind: "field-improvement",
@@ -143,12 +150,13 @@ export const fieldDeck: Deck = [
     name: "Focus on Quality",
     cost: {
       workers: 1,
-      gold: 0
+      gold: 1
     },
     copies: {
       2: 2,
-      3: 2,
-      4: 3
+      3: 3,
+      4: 4,
+      5: 4
     },
     additionalText:
       "When Fruit harvested from this Field is sold in the market, collect 3 additional Gold.\n\nA Field improved this way cannot produce more than 1 Fruit per Harvest."
@@ -158,13 +166,14 @@ export const fieldDeck: Deck = [
     id: "dense-planting",
     name: "Dense Planting",
     cost: {
-      workers: 1,
-      gold: 1
+      workers: 2,
+      gold: 0
     },
     copies: {
       2: 2,
-      3: 2,
-      4: 3
+      3: 3,
+      4: 4,
+      5: 4
     },
     additionalText:
       "Whenever this Field is harvested with using all rows, it yields 1 additional Fruit of the same type."
@@ -178,9 +187,10 @@ export const fieldDeck: Deck = [
       gold: 2
     },
     copies: {
-      2: 1,
-      3: 2,
-      4: 3
+      2: 2,
+      3: 3,
+      4: 4,
+      5: 4
     },
     additionalText:
       "Whenever this Field and at least 1 other Field are harvested using all rows, you may retain 1 Worker that would otherwise be returned to the Labor Supply."

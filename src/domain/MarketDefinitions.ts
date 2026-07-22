@@ -51,9 +51,9 @@ function placeholderInduces(index: number): readonly FruitName[] {
  */
 const placeholderDemandColumns = [
   { gold: 5, inducedDemand: 0, slots: [2] },
-  { gold: 3, inducedDemand: 1, slots: [2, 4] },
-  { gold: 2, inducedDemand: 1, slots: [2, 3] },
-  { gold: 1, inducedDemand: 1, slots: [2] },
+  { gold: 3, inducedDemand: 1, slots: [2, 5] },
+  { gold: 2, inducedDemand: 1, slots: [2, 4] },
+  { gold: 1, inducedDemand: 1, slots: [2, 3] },
   { gold: 0, inducedDemand: 2, slots: [2] }
 ] as const satisfies readonly DemandColumn[]
 

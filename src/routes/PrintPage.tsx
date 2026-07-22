@@ -4,7 +4,7 @@ import { expandDeck } from "~/cards/deckUtils"
 import { fieldDeck } from "~/cards/fieldDeck"
 import { influenceDeck } from "~/cards/influenceDeck"
 import { Card } from "~/components/Card"
-import type { PlayerCount } from "~/domain/CoreDefinitions"
+import { PLAYER_COUNTS, type PlayerCount } from "~/domain/CoreDefinitions"
 import { css } from "~/generated/styled-system/css"
 
 /**
@@ -38,8 +38,6 @@ const MARGIN_X = (PAGE_W - COLS * CARD_W) / 2 // 13.45mm
 const MARGIN_Y = (PAGE_H - ROWS * CARD_H) / 2 // 7.7mm
 const TICK_LEN = 4 // mm
 const TICK_W = 0.2 // mm
-
-const PLAYER_COUNTS: readonly PlayerCount[] = [2, 3, 4]
 
 function chunks<T>(arr: readonly T[], size: number): T[][] {
   const out: T[][] = []
@@ -149,7 +147,7 @@ function Ticks() {
 }
 
 export function PrintPage() {
-  const [players, setPlayers] = useState<PlayerCount>(4)
+  const [players, setPlayers] = useState<PlayerCount>(5)
   // Each deck is chunked into pages independently, then concatenated — so a
   // partially-filled last page of one deck never shares a sheet with the
   // next deck; the influence deck always starts on its own page.
