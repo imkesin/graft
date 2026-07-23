@@ -32,9 +32,8 @@ export type LaborSupplyDefinition = {
  */
 export const laborSupply: LaborSupplyDefinition = {
   workerTrack: [
-    { gold: 0, slots: [2, 3, 4, 5] },
-    { gold: 1, slots: [2, 2, 2, 2, 3, 4, 5] },
-    { gold: 2, slots: [2, 2, 2, 3, 4, 5] },
-    { gold: 3, slots: [2, 3, 4, 5] }
+    { gold: 1, slots: [2, 2, 3, 4, 5] },
+    { gold: 2, slots: [2, 2, 2, 2, 3, 4, 5] },
+    { gold: 3, slots: [2, 2, 2, 3, 4, 5] }
   ]
 }

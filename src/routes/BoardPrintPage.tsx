@@ -9,73 +9,59 @@ import { css } from "~/generated/styled-system/css"
 /**
  * Full board sheet for an 18x24in print-shop sheet, printed landscape (24in wide
  * x 18in tall). A 0.5in bleed/safe margin all around leaves an inscribed 23x17in
- * board, laid out as a CSS grid.
+ * board, laid out as a CSS grid. Content tracks are authored as literal decimal
+ * inches (Panda extracts `css()` statically, so a runtime unit() helper can't be
+ * used); the 0.5in tracks are empty gutters, so `gap` is 0.
  *
- * Tracks are conceived in a "double-resolution" unit grid: the inscribed board
- * is 46x34 half-inch units (1u = 0.5in), so an empty lane of size 1u is a slim
- * 0.5in gutter — half the width of a content inch's two units. The unit counts
- * below are authored as literal decimal inches in the styles (Panda extracts
- * `css()` statically, so a runtime unit() helper can't be used). Content tracks
- * take 2u per original inch; each 1u gutter surrenders 1u of "leftover" vs a
- * full 2u lane, which the flex/TBD zone of its grid absorbs — the `market`
- * (outer) and `emptyZone` placeholder (top band).
+ * A full-height `leftRail` (3in, the Labor Supply's width) runs top-to-bottom
+ * on the far left, holding the Foreign Markets section. The rest of the board
+ * seats the game's four worker-placement zones (one per Focus) as far apart as
+ * the sheet allows, pairing each with the supply it draws on:
  *
- * The board seats the game's five worker-placement zones (one per Focus) as far
- * apart as the sheet allows, pairing each with the supply it draws on. The
- * bottom band holds the two economy engines (the market, and the Labor Market
- * track + its zone); the top band holds the three card/field actions (a card
- * supply stacked over its zone, or just a zone where there's no supply):
- *
+ *     leftRail     Foreign Markets       (full-height rail)
  *     bottom-mid   Market ellipse        + Sell zone (dead centre)
- *     bottom-right Labor Market track    + Recruit zone
- *     top-left     (empty)
+ *     bottom-right Labor Supply track    + Recruit zone
  *     top-mid      (no supply)             Harvest zone
  *     top-right    Expansion Card supply + Expand zone
  *
  * The top and bottom bands have DIFFERENT column needs, so they don't share
- * tracks: the outer grid's columns serve only the bottom band, and the top band
- * (`topBand`) is a nested full-width grid with its own columns.
+ * tracks: the outer grid's columns serve only the bottom band, and `topBand` is
+ * a nested grid (spanning the outer center+gutter+workers columns) with its own.
  *
- * The former bottom-left `infra` column (Infrastructure tracks + Invest zone)
- * has been removed; its ~4in was absorbed mostly by the market (which grows from
- * 16.5in to 20in wide) and a little by the labor column (2in to 2.5in wide).
- *
- *   outer columns (u): 40 1 5  (= 46u = 23in)  [market gutter workers]
- *   outer rows (u):    11 1 17 1 4  (= 34u = 17in)
- *                        (market spans the bottom three rows = 22u = 11in)
+ *   outer columns: 3 0.5 16 0.5 3  (= 23in)  [leftRail g center g workers]
+ *   outer rows:    5.5 0.5 8.5 0.5 2 (= 17in)
  *
  *   outer gridTemplateAreas:
- *     "topBand topBand topBand"
- *     ".       .      ."
- *     "market  .      workers"
- *     "market  .      workers"
- *     "market  .      workers"
+ *     "leftRail . topBand topBand topBand"
+ *     "leftRail . .       .       ."
+ *     "leftRail . market  .       workers"
+ *     "leftRail . market  .       workers"
+ *     "leftRail . market  .       workers"
  *
- *   `topBand` spans the full 46u top row and holds its own grid:
- *     top columns (u): 12 1 14 1 18  (= 46u = 23in)
- *     top areas:   "cardsL . harvest . cardsR"
+ *   `topBand` spans the top row from the market column rightward (19.5in) with
+ *   its own grid:
+ *     top columns: 10 0.5 9  (= 19.5in)
+ *     top areas:   "harvest . cardsR"
  *
- *   - `market`: bottom 20x11in block (col 1, spanning all three bottom rows),
- *     the 7 MarketStalls on an ellipse (kept upright for legibility) with the
- *     Sell zone at its centre.
- *   - `workers`: bottom-right 2.5x11in (5u-wide) column spanning all three bottom
- *     rows, holding the Labor Market with the Recruit zone tucked below it,
- *     framed together.
- *   - `cardsL`: 6in column — intentionally empty (formerly the Influence
- *     supply + zone). `cardsR`: 9in column — three Expansion Card outlines over
- *     the Expand zone. `harvest`: 7in column centring the (supply-less) Harvest
- *     zone, absorbing the leftover width.
- *   - The 1u buffer columns/gutter and the 1u buffer rows are real empty grid
- *     cells, so `gap` is 0.
+ *   - `leftRail`: 3x17in full-height rail (Foreign Markets), a bare outlined
+ *     placeholder for now.
+ *   - `market`: bottom 16x11in block (center col, spanning all three bottom
+ *     rows), the 7 MarketStalls on an ellipse (kept upright for legibility) with
+ *     the Sell zone at its centre.
+ *   - `workers`: bottom-right 3x11in column spanning all three bottom rows,
+ *     holding the Labor Supply with the Recruit zone tucked below it, framed
+ *     together.
+ *   - `cardsR`: 9in column — three Expansion Card outlines over the Expand zone.
+ *     `harvest`: 10in column centring the (supply-less) Harvest zone.
  *
- * RADIUS_X is sized to the widened 20in market cell so the ring spreads into the
- * space freed by dropping the infra column; RADIUS_Y still fits the unchanged
- * 11in height. With 7 stalls anchored at the top vertex the ring's vertical
- * extremes are asymmetric (top sin=-1.0, bottom sin=+0.90), so OFFSET_Y nudges
- * it down to visually center the ellipse within the cell.
+ * RADIUS_X is sized to the 16in market cell (scaled down from the previous 20in
+ * to fund the two 3in rails); RADIUS_Y still fits the unchanged 11in height. With 7
+ * stalls anchored at the top vertex the ring's vertical extremes are asymmetric
+ * (top sin=-1.0, bottom sin=+0.90), so OFFSET_Y nudges it down to visually
+ * center the ellipse within the cell.
  */
 
-const RADIUS_X = 205
+const RADIUS_X = 164
 const RADIUS_Y = 105
 const OFFSET_Y = 5
 const STALL_COUNT = 7
@@ -134,21 +120,21 @@ const sheetStyle = css({
   boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
   flex: "none",
   display: "grid",
-  gridTemplateColumns: "20in 0.5in 2.5in",
+  gridTemplateColumns: "3in 0.5in 16in 0.5in 3in",
   gridTemplateRows: "5.5in 0.5in 8.5in 0.5in 2in",
-  gridTemplateAreas: `"topBand topBand topBand" ". . ." "market . workers" "market . workers" "market . workers"`,
+  gridTemplateAreas: `"leftRail . topBand topBand topBand" "leftRail . . . ." "leftRail . market . workers" "leftRail . market . workers" "leftRail . market . workers"`,
   gap: 0,
   padding: "0.5in"
 })
 
-// The top band is its own full-width (46u) grid, independent of the bottom's
-// gutter/market/workers tracks, so the card columns keep their width regardless
-// of the narrower bottom-corner cells below them.
+// The top band is its own grid (spanning the outer center+gutter+workers
+// columns), independent of the bottom's tracks, so the card columns keep their
+// width regardless of the narrower bottom-corner cells below them.
 const topBandArea = css({
   gridArea: "topBand",
   display: "grid",
-  gridTemplateColumns: "6in 0.5in 7in 0.5in 9in",
-  gridTemplateAreas: `"cardsL . harvest . cardsR"`,
+  gridTemplateColumns: "10in 0.5in 9in",
+  gridTemplateAreas: `"harvest . cardsR"`,
   gap: 0
 })
 
@@ -171,9 +157,11 @@ const cardStack = {
   paddingTop: "3mm"
 } as const
 
-// The former Influence column, now intentionally empty. It keeps its 6in grid
-// track so Harvest and Expand stay put; nothing is drawn in it.
-const cardsLArea = css({ gridArea: "cardsL" })
+// The full-height left rail: the Foreign Markets section. A bare placeholder for
+// now, sized to match the Labor Supply rail so the two read as a set, and using
+// the same faint dev outline as the other unfilled zones.
+const leftRailArea = css({ ...devOutline, gridArea: "leftRail" })
+
 const cardsRArea = css({ ...cardStack, gridArea: "cardsR" })
 
 // Harvest has no board supply, so its column just centres the bare zone.
@@ -244,8 +232,8 @@ export function BoardPrintPage() {
           Print → 24x18in landscape · Margins: None · Scale: 100%
         </div>
         <div className={`sheet ${sheetStyle}`}>
+          <div className={leftRailArea} />
           <div className={topBandArea}>
-            <div className={cardsLArea} />
             <div className={harvestArea}>
               <WorkerZone label="Harvest" />
             </div>

@@ -2,6 +2,11 @@
 
 This project defines a "Print and Play" version of the prototype board game Graft.
 
+## Interaction w/ User
+
+- In most cases, you can ask the user to look at the visual output to determine quality and request
+  revisions.
+
 ## Styling
 
 - Always lean into the CSS grid for layout, even if it requires many rows and columns;

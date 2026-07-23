@@ -33,7 +33,7 @@ export const FOCUS_ACTION_METADATA = {
         id: "recruit-recruit",
         name: "Recruit",
         ruleDescription:
-          "Hire the lowest cost Worker for free. Then, you may hire any number of Workers from the labor pool by paying their cost in Gold.\n\nRepeat the process for each additional Family Worker already in the Recruit zone.\n\nIf, at the start of your turn, you employed fewer Workers than another player, you may Poach any number of workers from other Players by paying 1 Gold more than the highest cost listed in the labor pool."
+          "For each Family Worker in the Recruit zone, hire the lowest cost Worker for free. Then, you may hire any number of additional Workers by paying their cost in Gold.\n\nIf, at the start of your turn, you employed fewer Workers than another player, you may Poach any number of workers from other Players by paying 1 Gold more than the highest cost listed in the labor pool."
       }
     ]
   },
