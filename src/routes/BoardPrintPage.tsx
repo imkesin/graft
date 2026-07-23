@@ -190,7 +190,7 @@ const cardOutline = css({
 const cardOutlineSize = { width: `${CARD_TRIM_W}mm`, height: `${CARD_TRIM_H}mm` }
 
 // The bottom-corner zone cells just centre a labelled WorkerZone. No outline of
-// their own — they sit inside the infra/workers column, which frames them.
+// their own — they sit inside the workers column, which frames them.
 const zoneCell = css({
   display: "flex",
   alignItems: "center",

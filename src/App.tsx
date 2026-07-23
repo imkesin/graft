@@ -1,10 +1,6 @@
 import { useEffect, useState } from "react"
 import { fieldDeck, previewCard } from "~/cards/fieldDeck"
-import { AnotherTurn } from "~/components/benefits/AnotherTurn"
-import { OverflowSlot } from "~/components/benefits/OverflowSlot"
-import { TransportCapacityIncrease } from "~/components/benefits/TransportCapacityIncrease"
 import { Card } from "~/components/Card"
-import { FieldDiscard } from "~/components/icons/FieldDiscard"
 import { GoldCost } from "~/components/icons/GoldCost"
 import { InducedDemand } from "~/components/icons/InducedDemand"
 import { WorkerCost } from "~/components/icons/WorkerCost"
@@ -104,24 +100,6 @@ export function App() {
       <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
         <InducedDemand amount={1} />
         <InducedDemand amount={2} />
-      </div>
-      <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
-        <FieldDiscard amount={1} />
-        <FieldDiscard amount={2} />
-        <FieldDiscard amount={3} />
-      </div>
-      <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
-        <OverflowSlot amount={2} />
-        <OverflowSlot amount={5} />
-      </div>
-      <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
-        <TransportCapacityIncrease amount={1} />
-        <TransportCapacityIncrease amount={2} />
-        <TransportCapacityIncrease amount={3} />
-      </div>
-      <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
-        <AnotherTurn amount={1} />
-        <AnotherTurn amount={2} />
       </div>
       <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
         {FRUIT_LIST_WITH_METADATA.map((f) => <FruitCrateSlot key={f.name} color={f.color} letter={f.name.charAt(0)} />)}
