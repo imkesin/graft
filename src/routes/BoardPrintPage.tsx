@@ -28,7 +28,7 @@ import { css } from "~/generated/styled-system/css"
  *
  *     bottom-mid   Market ellipse        + Sell zone (dead centre)
  *     bottom-right Labor Market track    + Recruit zone
- *     top-left     Influence Card supply + Influence zone
+ *     top-left     (empty)
  *     top-mid      (no supply)             Harvest zone
  *     top-right    Expansion Card supply + Expand zone
  *
@@ -61,10 +61,10 @@ import { css } from "~/generated/styled-system/css"
  *   - `workers`: bottom-right 2.5x11in (5u-wide) column spanning all three bottom
  *     rows, holding the Labor Market with the Recruit zone tucked below it,
  *     framed together.
- *   - `cardsL`: 6in column — two Influence Card outlines over the Influence zone.
- *     `cardsR`: 9in column — three Expansion Card outlines over the Expand
- *     zone (Influence:Expand = 2:3). `harvest`: 7in column centring the
- *     (supply-less) Harvest zone, absorbing the leftover width.
+ *   - `cardsL`: 6in column — intentionally empty (formerly the Influence
+ *     supply + zone). `cardsR`: 9in column — three Expansion Card outlines over
+ *     the Expand zone. `harvest`: 7in column centring the (supply-less) Harvest
+ *     zone, absorbing the leftover width.
  *   - The 1u buffer columns/gutter and the 1u buffer rows are real empty grid
  *     cells, so `gap` is 0.
  *
@@ -171,7 +171,9 @@ const cardStack = {
   paddingTop: "3mm"
 } as const
 
-const cardsLArea = css({ ...cardStack, gridArea: "cardsL" })
+// The former Influence column, now intentionally empty. It keeps its 6in grid
+// track so Harvest and Expand stay put; nothing is drawn in it.
+const cardsLArea = css({ gridArea: "cardsL" })
 const cardsRArea = css({ ...cardStack, gridArea: "cardsR" })
 
 // Harvest has no board supply, so its column just centres the bare zone.
@@ -243,16 +245,7 @@ export function BoardPrintPage() {
         </div>
         <div className={`sheet ${sheetStyle}`}>
           <div className={topBandArea}>
-            <div className={cardsLArea}>
-              <div className={supplyRow}>
-                {Array.from({ length: 2 }, (_, i) => (
-                  <div key={i} className={cardOutline} style={cardOutlineSize}>
-                    Influence
-                  </div>
-                ))}
-              </div>
-              <WorkerZone label="Influence" />
-            </div>
+            <div className={cardsLArea} />
             <div className={harvestArea}>
               <WorkerZone label="Harvest" />
             </div>

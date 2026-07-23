@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react"
 import { fieldDeck, previewCard } from "~/cards/fieldDeck"
-import { influenceDeck } from "~/cards/influenceDeck"
 import { AnotherTurn } from "~/components/benefits/AnotherTurn"
 import { OverflowSlot } from "~/components/benefits/OverflowSlot"
 import { TransportCapacityIncrease } from "~/components/benefits/TransportCapacityIncrease"
@@ -18,8 +17,7 @@ import { marketStalls } from "~/domain/MarketDefinitions"
 import { css } from "~/generated/styled-system/css"
 
 const allCards = [
-  ...fieldDeck,
-  ...influenceDeck
+  ...fieldDeck
 ]
 
 const page = css({

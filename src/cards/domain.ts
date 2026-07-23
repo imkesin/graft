@@ -1,18 +1,5 @@
 import type { FruitName, PlayerCount } from "~/domain/CoreDefinitions"
 
-/**
- * The three social groups an Influence card can court. Defined here (mirroring
- * `FRUIT_LIST_WITH_METADATA`) so the set is single-sourced and the compiler can
- * validate every card's `group`. Name-only for now; richer per-group metadata
- * (flavor, color, icon) can be added to these entries later.
- */
-export const GROUP_LIST_WITH_METADATA = [
-  { name: "Elites" },
-  { name: "Merchants" },
-  { name: "People" }
-] as const
-export type GroupName = typeof GROUP_LIST_WITH_METADATA[number]["name"]
-
 /** Resource cost to play a card. Both required; 0 = none of that resource. */
 export type Cost = {
   readonly workers: number
@@ -57,38 +44,9 @@ export type FieldImprovementCardBase = {
   readonly additionalText: string
 }
 
-/**
- * A personal goal card, drafted from its own shared Influence deck rather than
- * the Field/Field-improvement deck. Unlike the other kinds it carries no play
- * `cost`: you acquire it (flat off-card price) and later fulfill it. The goal
- * itself and any timing preconditions live in `additionalText`. Each card
- * courts exactly one `group`.
- */
-export type InfluenceCardBase = {
-  readonly kind: "influence"
-  readonly id: string
-  readonly name: string
-  readonly group: GroupName
-  readonly additionalText: string
-}
-
-/**
- * A ballot card that ships inside the Influence deck but is its own kind (as
- * field-improvement is to field). Placeholder: it carries only a name
- * ("Election") and its copy counts — the body is intentionally empty until the
- * mechanic is designed.
- */
-export type ElectionCardBase = {
-  readonly kind: "election"
-  readonly id: string
-  readonly name: string
-}
-
 export type CardBase =
   | FieldCardBase
   | FieldImprovementCardBase
-  | InfluenceCardBase
-  | ElectionCardBase
 
 /**
  * A catalog entry: a card's intrinsic data plus how many copies the printed deck

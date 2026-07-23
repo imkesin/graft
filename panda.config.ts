@@ -71,7 +71,7 @@ export default defineConfig({
           name: u(3.8),
           body: u(3.4),
           // One step down from `body`, for paragraph-style rules text
-          // (field-improvement, influence) rather than table/label text.
+          // (field-improvement) rather than table/label text.
           paragraph: u(2.8),
           micro: u(2.2)
         }

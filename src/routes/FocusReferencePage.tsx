@@ -2,7 +2,7 @@ import { FOCUS_ACTION_METADATA, FOCUSES } from "~/domain/FocusDefinitions"
 import { css } from "~/generated/styled-system/css"
 
 /**
- * Single-page player reference for the five Focus actions. Not a rulebook — a
+ * Single-page player reference for the four Focus actions. Not a rulebook — a
  * one-sheet "latest rules" card a player keeps beside them: each Focus, its
  * action name, and the current rule text, laid out to fit one US Letter page.
  *
@@ -23,7 +23,6 @@ const MARGIN = 14
 const ACCENT: Record<string, string> = {
   Expand: "#059669", // emerald.600
   Harvest: "#d97706", // amber.600
-  Influence: "#7c3aed", // violet.600
   Recruit: "#0284c7", // sky.600
   Sell: "#e11d48" // rose.600
 }

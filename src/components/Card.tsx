@@ -1,6 +1,6 @@
 import { ArrowRight } from "lucide-react"
 import { Fragment, type ReactNode } from "react"
-import type { Card, CardBase, Cost, FieldCardBase, FieldImprovementCardBase, InfluenceCardBase } from "~/cards/domain"
+import type { Card, CardBase, Cost, FieldCardBase, FieldImprovementCardBase } from "~/cards/domain"
 import { GoldCost } from "~/components/icons/GoldCost"
 import { WorkerCost } from "~/components/icons/WorkerCost"
 import { paperFrame } from "~/components/paperFrame"
@@ -11,23 +11,19 @@ import { css, cva, cx } from "~/generated/styled-system/css"
 import { Guides } from "./Guides"
 
 /**
- * Field cards read as green (fields, crops); field-improvements as stone;
- * influences as zinc — near-white, with the header/footer bands brighter
- * than the body rather than the dark-band inversion the other two kinds use.
+ * Field cards read as green (fields, crops); field-improvements as stone.
  */
 type CardKind = CardBase["kind"]
 
 // The card's base surface, by kind — the shared `paperFrame` recipe (see
-// ~/components/paperFrame) covers all four kinds with no deviation.
+// ~/components/paperFrame) covers both kinds with no deviation.
 const KIND_PAPER_COLOR = {
   field: "green",
-  "field-improvement": "stone",
-  influence: "zinc",
-  election: "cyan"
+  "field-improvement": "stone"
 } as const satisfies Record<CardKind, string>
 
 /** Field-improvement uses a rules-text body layout (a cost rail over a
- * freeform text band). Influence has its own thirds layout (`InfluenceBody`). */
+ * freeform text band). */
 type TextCardBase = FieldImprovementCardBase
 
 /**
@@ -70,31 +66,23 @@ const frame = css({
 })
 
 // Header/footer bands and the cost badge, by kind. Field and field-improvement
-// invert contrast (dark band, light ink); influence instead brightens the
-// band above the body while keeping ink dark throughout.
+// invert contrast (dark band, light ink).
 const darkBand = cva({
   variants: {
     kind: {
       field: { background: "green.900", color: "green.50" },
-      "field-improvement": { background: "stone.900", color: "stone.50" },
-      influence: { background: "white", color: "zinc.900" },
-      election: { background: "cyan.600", color: "cyan.50" },
-      infrastructure: { background: "neutral.900", color: "neutral.50" }
+      "field-improvement": { background: "stone.900", color: "stone.50" }
     }
   }
 })
 
 // Border for the player-count ring, chosen to contrast against this kind's
-// band background — the paper colour where the band is dark, the ink colour
-// where the band (influence) is light.
+// band background — the paper colour, since every band is dark.
 const paperBorder = cva({
   variants: {
     kind: {
       field: { borderColor: "green.50" },
-      "field-improvement": { borderColor: "stone.50" },
-      influence: { borderColor: "zinc.900" },
-      election: { borderColor: "cyan.50" },
-      infrastructure: { borderColor: "neutral.50" }
+      "field-improvement": { borderColor: "stone.50" }
     }
   }
 })
@@ -118,10 +106,7 @@ const accentOutline = cva({
   variants: {
     kind: {
       field: { outlineColor: "green.500" },
-      "field-improvement": { outlineColor: "stone.500" },
-      influence: { outlineColor: "zinc.500" },
-      election: { outlineColor: "cyan.500" },
-      infrastructure: { outlineColor: "neutral.500" }
+      "field-improvement": { outlineColor: "stone.500" }
     }
   }
 })
@@ -165,7 +150,7 @@ const titleText = css({
 // that runs out to the card's right edge. Rows: fields keep the lead/cost band
 // over the harvest table (2fr/3fr); text-body cards (field-improvement,
 // improvement) split evenly (1fr/1fr) since their rules text fills the bottom
-// half. Influence does not use this region — see `influenceBody`.
+// half.
 const bodyRegion = cva({
   base: {
     gridColumn: "1 / -1",
@@ -179,8 +164,7 @@ const bodyRegion = cva({
   variants: {
     kind: {
       field: { gridTemplateRows: "2fr 3fr" },
-      "field-improvement": { gridTemplateRows: "1fr 1fr" },
-      infrastructure: { gridTemplateRows: "1fr 1fr" }
+      "field-improvement": { gridTemplateRows: "1fr 1fr" }
     }
   }
 })
@@ -196,7 +180,7 @@ const bodyTopMain = css({
   gap: "2"
 })
 
-// Shared by field-improvement and influence, the two rules-text kinds.
+// Used by field-improvement, the rules-text kind.
 // Mirrors `fieldTable`: the bottom row's `auto` cost column goes unused (the
 // cost rail only ever occupies row 1), so this spans `1 / -1` and re-declares
 // its own gutter|1fr|gutter columns to reclaim that width instead of being
@@ -215,8 +199,7 @@ const textBand = cva({
   },
   variants: {
     kind: {
-      "field-improvement": { borderTopColor: "stone.500" },
-      infrastructure: { borderTopColor: "neutral.500" }
+      "field-improvement": { borderTopColor: "stone.500" }
     }
   }
 })
@@ -233,71 +216,6 @@ const textBandContent = css({
   display: "flex",
   flexDirection: "column",
   gap: "2"
-})
-
-// Influence body: two rows (art · text) rather than the field/improvement
-// column split. Columns mirror the field body (gutter | 1fr | auto) so the
-// fulfilment cost rides the same top-right rail as a field's acquisition cost;
-// the text band spans every column and re-declares gutter|1fr|gutter so it
-// bleeds edge to edge.
-const influenceBody = css({
-  gridColumn: "1 / -1",
-  display: "grid",
-  gridTemplateColumns: "var(--gutter) 1fr auto",
-  // Art on top; the group name and goal text fill the larger lower row.
-  gridTemplateRows: "1fr 2fr",
-  minHeight: 0,
-  fontSize: "body"
-})
-
-// Top row: intentionally blank space reserved for art. Spans every column so
-// future art bleeds full width; the cost rail sits over its top-right corner.
-const influenceArt = css({
-  gridColumn: "1 / -1",
-  gridRow: "1",
-  minHeight: 0
-})
-
-// Lower row: full-bleed text band parted from the art above by a hairline rule
-// (mirrors `textBand`/`fieldTable` dividers). Holds the bold group name and the
-// goal / completion condition.
-const influenceBand = css({
-  gridColumn: "1 / -1",
-  gridRow: "2",
-  minHeight: 0,
-  display: "grid",
-  gridTemplateColumns: "var(--gutter) 1fr var(--gutter)",
-  borderTopWidth: "0.3mm",
-  borderTopStyle: "solid",
-  borderTopColor: "zinc.500"
-})
-
-// The impacted group, a bold lead-in ahead of the goal text.
-const influenceGroupName = css({
-  fontWeight: 700,
-  letterSpacing: "0.02em"
-})
-
-// Lower row content: the bold group name followed by the goal / completion
-// condition (plus any timing preconditions) as one freeform paragraph.
-const influenceGoalContent = css({
-  gridColumn: "2",
-  minWidth: 0,
-  paddingTop: "3",
-  fontSize: "paragraph",
-  lineHeight: 1.35,
-  whiteSpace: "pre-line",
-  display: "flex",
-  flexDirection: "column",
-  justifyContent: "flex-start",
-  gap: "2"
-})
-
-// Election body: intentionally empty for now. Occupies the body row so the
-// footer stays pinned to the bottom of the frame grid.
-const electionBody = css({
-  gridColumn: "1 / -1",
-  minHeight: 0
 })
 
 // Cost rail in the `auto` column, centered down the top-half row. That track
@@ -491,20 +409,6 @@ function textCardRegions(card: TextCardBase): BodyRegions {
   }
 }
 
-function InfluenceBody({ card }: { card: InfluenceCardBase }) {
-  return (
-    <div className={influenceBody}>
-      <div className={influenceArt} />
-      <div className={influenceBand}>
-        <div className={influenceGoalContent}>
-          <span className={influenceGroupName}>{card.group}</span>
-          {card.additionalText}
-        </div>
-      </div>
-    </div>
-  )
-}
-
 function Footer({
   minPlayerCount,
   kind
@@ -533,12 +437,6 @@ function bodyRegions(card: FieldCardBase | FieldImprovementCardBase): BodyRegion
 }
 
 function CardBody({ card }: { card: Card }) {
-  if (card.kind === "influence") {
-    return <InfluenceBody card={card} />
-  }
-  if (card.kind === "election") {
-    return <div className={electionBody} />
-  }
   const regions = bodyRegions(card)
   return (
     <div className={bodyRegion({ kind: card.kind })}>

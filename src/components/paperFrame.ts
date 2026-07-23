@@ -4,12 +4,9 @@ import { cva } from "~/generated/styled-system/css"
  * Paper surface + inverted dark band, tinted by a single Panda color scale:
  * `{color}.50` paper / `{color}.900` ink / `{color}.500` border for the
  * surface, background/ink inverted for the band. Shared by every card-like
- * surface that follows this recipe — Card's field/field-improvement/
- * influence/election kinds, MarketStall's fruit colors, and LaborSupply's
- * brown. Card.tsx's frame has no visible border, so the borderColor is simply
- * unused there. Card.tsx's influence/election kinds still layer their own
- * band override on top (see Card.tsx) since those two don't follow the
- * inverted-band half of the recipe.
+ * surface that follows this recipe — Card's field/field-improvement kinds,
+ * MarketStall's fruit colors, and LaborSupply's brown. Card.tsx's frame has no
+ * visible border, so the borderColor is simply unused there.
  */
 export const paperFrame = cva({
   variants: {

@@ -1,7 +1,6 @@
 export const FOCUSES = [
   "Expand",
   "Harvest",
-  "Influence",
   "Recruit",
   "Sell"
 ] as const
@@ -14,7 +13,7 @@ export const FOCUS_ACTION_METADATA = {
         id: "expand-expand",
         name: "Expand",
         ruleDescription:
-          "Select 1 of the visible Field Cards, collect all gold it, and place it in your player zone. Or, reveal 1 Field Card from your hand and place it in your Player Zone.\n\nImmediately pay the cost listed on the card. Each Family Worker in the Expand zone is counted toward the Worker cost\n\nIf necessary, fill any empty expansion space on the Board. Place 1 coin from Supply on each visible Field Card."
+          "Select 1 of the visible Field Cards, collect all gold on it, and place it in your player zone. Or, reveal 1 Field Card from your hand and place it in your Player Zone.\n\nImmediately pay the cost listed on the card. Each Family Worker in the Expand zone is counted toward the Worker cost.\n\nIf the Field was selected from the visible set, place 1 coin from Supply on each of the remaining Field Cards. Then, reveal another Field card from the Field Card Supply."
       }
     ]
   },
@@ -25,16 +24,6 @@ export const FOCUS_ACTION_METADATA = {
         name: "Harvest",
         ruleDescription:
           "Produce 1 or more Fruits from your Fields by assigning Workers to their rows.\n\nRows must be worked from top to bottom. Each of your Family Workers in the Harvest zone is counted toward the Worker cost.\n\nA field with any number of Fruits already on it may not be harvested; they must be taken to market first."
-      }
-    ]
-  },
-  Influence: {
-    actions: [
-      {
-        id: "influence-influence",
-        name: "Influence",
-        ruleDescription:
-          "Pay 1 Gold for each Influence Card you have in play.\n\nLook at the top card of the Influence Supply. You may put it back on top, move it to the bottom of the Supply, or you may put it face-up in the Influence zone. If you reveal it face-up, move one of the other Influence cards to the bottom of the Supply.\n\nRepeat the process for each additional Family Worker already in the Influence zone."
       }
     ]
   },
