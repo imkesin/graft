@@ -1,4 +1,5 @@
 import { CARD_TRIM_H_MM, CARD_TRIM_W_MM } from "~/cards/cardSize"
+import { ForeignMarketTrack } from "~/components/ForeignMarketTrack"
 import { LaborSupply } from "~/components/LaborSupply"
 import { MarketStall } from "~/components/MarketStall"
 import { WorkerZone } from "~/components/WorkerZone"
@@ -160,7 +161,7 @@ const cardStack = {
 // The full-height left rail: the Foreign Markets section. A bare placeholder for
 // now, sized to match the Labor Supply rail so the two read as a set, and using
 // the same faint dev outline as the other unfilled zones.
-const leftRailArea = css({ ...devOutline, gridArea: "leftRail" })
+const leftRailArea = css({ ...devOutline, gridArea: "leftRail", padding: "0" })
 
 const cardsRArea = css({ ...cardStack, gridArea: "cardsR" })
 
@@ -232,7 +233,9 @@ export function BoardPrintPage() {
           Print → 24x18in landscape · Margins: None · Scale: 100%
         </div>
         <div className={`sheet ${sheetStyle}`}>
-          <div className={leftRailArea} />
+          <div className={leftRailArea}>
+            <ForeignMarketTrack />
+          </div>
           <div className={topBandArea}>
             <div className={harvestArea}>
               <WorkerZone label="Harvest" />

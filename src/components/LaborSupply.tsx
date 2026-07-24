@@ -1,5 +1,5 @@
 import { GoldCost } from "~/components/icons/GoldCost"
-import { darkBand, paperFrame } from "~/components/paperFrame"
+import { paperFrame, softBand } from "~/components/paperFrame"
 import { WorkerSlot } from "~/components/slots/WorkerSlot"
 import { PLAYER_COUNTS } from "~/domain/CoreDefinitions"
 import type { LaborSupplyTier } from "~/domain/LaborSupplyDefinitions"
@@ -85,7 +85,7 @@ const staggered = css({
 export function LaborSupply({ track: tiers }: { track: readonly LaborSupplyTier[] }) {
   return (
     <div className={cx(frame, paperFrame({ color: "stone" }))}>
-      <div className={cx(header, darkBand({ color: "stone" }))}>Labor Supply</div>
+      <div className={cx(header, softBand({ color: "stone" }))}>Labor Supply</div>
       <div
         className={track}
         style={{ gridTemplateRows: tiers.map((t) => `${Math.ceil(t.slots.length / SLOTS_PER_ROW)}fr`).join(" ") }}

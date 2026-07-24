@@ -53,6 +53,32 @@ export const panelTint = cva({
   }
 })
 
+/**
+ * A low-contrast header band: a light tint of the scale (`{color}.200`) with
+ * mid-dark ink (`{color}.700`), so the header reads as quiet chrome rather than
+ * the shouting inverse of `darkBand`. Used by the board's supporting supplies
+ * (Foreign Markets, Labor Supply) so they don't compete with the market stalls.
+ */
+export const softBand = cva({
+  variants: {
+    color: {
+      red: { background: "red.200", color: "red.700" },
+      orange: { background: "orange.200", color: "orange.700" },
+      yellow: { background: "yellow.200", color: "yellow.700" },
+      amber: { background: "amber.200", color: "amber.700" },
+      lime: { background: "lime.200", color: "lime.700" },
+      green: { background: "green.200", color: "green.700" },
+      violet: { background: "violet.200", color: "violet.700" },
+      pink: { background: "pink.200", color: "pink.700" },
+      stone: { background: "stone.200", color: "stone.700" },
+      brown: { background: "brown.200", color: "brown.700" },
+      zinc: { background: "zinc.200", color: "zinc.700" },
+      cyan: { background: "cyan.200", color: "cyan.700" },
+      neutral: { background: "neutral.200", color: "neutral.700" }
+    }
+  }
+})
+
 export const darkBand = cva({
   variants: {
     color: {

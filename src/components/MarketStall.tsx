@@ -50,7 +50,7 @@ const frame = css({
 const header = css({
   gridArea: "header",
   textAlign: "center",
-  fontSize: "name",
+  fontSize: "title",
   fontWeight: 700,
   letterSpacing: "0.02em",
   paddingBlock: "2"

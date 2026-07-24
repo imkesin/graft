@@ -38,6 +38,7 @@ export function FruitCrateSlot(
     size,
     fill,
     ink,
+    rim,
     className
   }: {
     color?: FruitColor
@@ -49,6 +50,8 @@ export function FruitCrateSlot(
     fill?: string
     /** Override the stamped-letter colour; defaults to the fruit tint / faint stone. */
     ink?: string
+    /** Override the rim colour (any CSS colour); defaults to faint stone. */
+    rim?: string
     className?: string
   }
 ) {
@@ -74,7 +77,7 @@ export function FruitCrateSlot(
         rx={RADIUS}
         ry={RADIUS}
         fill={fillColor}
-        stroke="var(--colors-stone-400)"
+        stroke={rim ?? "var(--colors-stone-400)"}
         strokeWidth={STROKE}
       />
       {stamp && (
